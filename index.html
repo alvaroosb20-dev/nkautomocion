@@ -105,7 +105,9 @@ header.scrolled{background:rgba(8,9,11,.78);backdrop-filter:saturate(1.4) blur(1
 header.hide{transform:translateY(-100%)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:84px;gap:24px}
 .menu{display:flex;gap:6px;font-size:.9rem;font-weight:500;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:999px;padding:5px;backdrop-filter:blur(10px)}
-.menu a{color:var(--soft);padding:8px 16px;border-radius:999px;transition:color .25s,background .25s}
+.menu a{color:var(--soft);padding:8px 13px;border-radius:999px;transition:color .25s,background .25s;white-space:nowrap;font-size:.86rem}
+.nav-phone{white-space:nowrap}
+@media (max-width:1380px){.nav-phone{display:none!important}}
 .menu a:hover{color:#fff}
 .menu a.active{color:var(--ink);background:var(--accent)}
 .nav-actions{display:flex;align-items:center;gap:14px}
@@ -175,6 +177,23 @@ header.hide{transform:translateY(-100%)}
 @keyframes mq{to{transform:translateX(-50%)}}
 
 section{padding:150px 0;position:relative}
+
+
+/* ===== SECTORES ===== */
+.sectors{background:var(--bg);padding:130px 0 110px}
+.sec-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.sector{position:relative;border:1px solid var(--line);border-radius:24px;padding:30px 28px;background:var(--card);overflow:hidden;isolation:isolate;min-height:300px;display:flex;flex-direction:column;transition:border-color .4s,transform .6s var(--ease)}
+.sector::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(380px circle at var(--mx,50%) var(--my,0%),rgba(242,198,55,.12),transparent 50%);opacity:0;transition:opacity .4s}
+.sector:hover{border-color:rgba(242,198,55,.4);transform:translateY(-6px)}
+.sector:hover::before{opacity:1}
+.sector .s-ic{width:64px;height:64px;border-radius:16px;background:rgba(242,198,55,.1);border:1px solid rgba(242,198,55,.22);color:var(--accent);display:grid;place-items:center;margin-bottom:auto;transition:transform .6s var(--ease)}
+.sector:hover .s-ic{transform:rotate(-8deg) scale(1.08)}
+.sector .s-n{position:absolute;top:28px;right:28px;font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+.sector h3{font-size:2.4rem;margin:40px 0 10px}
+.sector p{color:var(--muted);font-size:.93rem}
+@media (max-width:1100px){.sec-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:760px){.sectors{padding:90px 0 70px}.sec-grid{gap:10px}.sector{min-height:0;padding:22px 18px}.sector h3{font-size:1.7rem;margin-top:26px}.sector .s-ic{width:52px;height:52px}.sector p{font-size:.84rem}.sector .s-n{top:20px;right:18px}}
+@media (max-width:370px){.sec-grid{grid-template-columns:1fr}}
 
 /* ===== HORIZONTAL CATEGORIES ===== */
 .h-section{padding:0;background:var(--bg)}
@@ -326,6 +345,8 @@ form.card .sub{grid-column:1/-1;color:var(--muted);font-size:.9rem;margin-top:-8
 .consent{grid-column:1/-1;display:flex;gap:12px;font-size:.84rem;color:var(--muted);align-items:flex-start;line-height:1.5}
 .consent input{margin-top:3px;width:17px;height:17px;accent-color:var(--accent);flex:none}
 .consent a{color:var(--soft);text-decoration:underline;text-underline-offset:2px}
+form.card{position:relative}
+form.card .btn[disabled]{opacity:.7;pointer-events:none}
 .form-msg{grid-column:1/-1;font-size:.9rem;display:none;padding:12px 14px;border-radius:10px}
 .form-msg.ok{display:block;background:rgba(126,226,160,.08);color:#7ee2a0;border:1px solid rgba(126,226,160,.2)}
 .form-msg.ko{display:block;background:rgba(255,107,107,.08);color:#ff8f8f;border:1px solid rgba(255,107,107,.2)}
@@ -457,6 +478,7 @@ footer ul a:hover{color:var(--accent)}
   <div class="wrap nav">
     <a href="#inicio" class="logo" aria-label="NK Automoción, inicio"><span class="nk-box">NK</span><span class="nk-word">AUTOMOCIÓN</span></a>
     <nav class="menu" aria-label="Principal">
+      <a href="#sectores">Sectores</a>
       <a href="#servicios">Qué ofrecemos</a>
       <a href="#por-que">Por qué nosotros</a>
       <a href="#como-trabajamos">Cómo trabajamos</a>
@@ -474,6 +496,7 @@ footer ul a:hover{color:var(--accent)}
 </header>
 
 <nav class="mnav" id="mnav" aria-label="Menú móvil">
+  <a class="ml" href="#sectores">Sectores <span>00</span></a>
   <a class="ml" href="#servicios">Qué ofrecemos <span>01</span></a>
   <a class="ml" href="#por-que">Por qué nosotros <span>02</span></a>
   <a class="ml" href="#como-trabajamos">Cómo trabajamos <span>03</span></a>
@@ -501,12 +524,12 @@ footer ul a:hover{color:var(--accent)}
     <h1 class="hero-title">
       <span class="ln"><span>Potencia</span></span>
       <span class="ln"><span class="o">y tecnología</span></span>
-      <span class="ln"><span class="y">para tu coche</span></span>
+      <span class="ln"><span class="y">para tu motor</span></span>
     </h1>
-    <p class="hero-lead hero-fade f1">Repuestos, accesorios y herramientas de calidad profesional, seleccionados por especialistas. Te encontramos la pieza exacta.</p>
+    <p class="hero-lead hero-fade f1">Repuestos, accesorios y herramientas de calidad profesional para coches, motos, náutica y pymes. Te encontramos la pieza exacta.</p>
     <div class="hero-cta hero-fade f2">
       <a class="btn btn-primary btn-lg magnetic" href="tel:+34922293649" data-cursor="Llamar"><span class="ring-ic"><svg width="15" height="15"><use href="#i-phone"/></svg></span>Llamar · 922 29 36 49</a>
-      <a class="btn btn-ghost btn-lg magnetic hide-m" href="#contacto">Pedir presupuesto <svg class="arr" width="18" height="18"><use href="#i-arrow"/></svg></a>
+      <a class="btn btn-ghost btn-lg magnetic hide-m to-form" href="#presupuesto">Pedir presupuesto <svg class="arr" width="18" height="18"><use href="#i-arrow"/></svg></a>
     </div>
   </div>
 
@@ -526,9 +549,26 @@ footer ul a:hover{color:var(--accent)}
 <div class="marquee" aria-hidden="true">
   <div class="mq-skew" id="mqSkew">
     <div class="mq-row"><span>Frenos</span><span>Filtros</span><span>Aceites</span><span>Iluminación</span><span>Baterías</span><span>Motor</span><span>Herramientas</span><span>Accesorios</span><span>Frenos</span><span>Filtros</span><span>Aceites</span><span>Iluminación</span><span>Baterías</span><span>Motor</span><span>Herramientas</span><span>Accesorios</span></div>
-    <div class="mq-row rev"><span>Calidad profesional</span><span>Asesoramiento experto</span><span>Envíos rápidos</span><span>Soporte 24/7</span><span>Calidad profesional</span><span>Asesoramiento experto</span><span>Envíos rápidos</span><span>Soporte 24/7</span></div>
+    <div class="mq-row rev"><span>Pymes</span><span>Náutica</span><span>Coches</span><span>Motos</span><span>Calidad profesional</span><span>Asesoramiento experto</span><span>Envíos rápidos</span><span>Soporte 24/7</span><span>Calidad profesional</span><span>Asesoramiento experto</span><span>Envíos rápidos</span><span>Soporte 24/7</span></div>
   </div>
 </div>
+
+
+<!-- ===== TRABAJAMOS CON ===== -->
+<section class="sectors" id="sectores">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="reveal"><span class="eyebrow">Trabajamos con</span><h2>Particulares <span class="y">y empresas</span></h2></div>
+      <p class="reveal d1">Damos servicio a pymes, al sector náutico y a todo tipo de vehículos de tierra. Cuéntanos qué necesitas y te asesoramos.</p>
+    </div>
+    <div class="sec-grid">
+      <a href="#presupuesto" class="sector reveal to-form" data-sector="Pymes"><span class="s-n">01</span><span class="s-ic"><svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="30" height="30"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-5h6v5M9 10h.01M12 10h.01M15 10h.01M9 13h.01M12 13h.01M15 13h.01"/></svg></span><h3>Pymes</h3><p>Suministro para empresas, flotas y talleres, con atención y condiciones a medida.</p></a>
+      <a href="#presupuesto" class="sector reveal d1 to-form" data-sector="Náutica"><span class="s-n">02</span><span class="s-ic"><svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="30" height="30"><circle cx="12" cy="5" r="2"/><path d="M12 7v14M8 11h8"/><path d="M4 14c0 4 3.6 7 8 7s8-3 8-7"/><path d="M2 14h4M18 14h4"/></svg></span><h3>Náutica</h3><p>Repuestos y accesorios para embarcaciones y motores marinos.</p></a>
+      <a href="#presupuesto" class="sector reveal d2 to-form" data-sector="Coches"><span class="s-n">03</span><span class="s-ic"><svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="30" height="30"><path d="M5 17h14M6 17l1.5-6h9L18 17M8 11l1.5-4h5L16 11"/><circle cx="8" cy="17" r="2"/><circle cx="16" cy="17" r="2"/></svg></span><h3>Coches</h3><p>Turismos, SUV y furgonetas: frenos, filtros, motor, iluminación y más.</p></a>
+      <a href="#presupuesto" class="sector reveal d3 to-form" data-sector="Motos"><span class="s-n">04</span><span class="s-ic"><svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="30" height="30"><circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="M5.5 16.5 9 10h5l4.5 6.5M14 10l-2-4h-2M15 6h3l1.5 3"/></svg></span><h3>Motos</h3><p>Recambios y accesorios para motos y scooters de todas las cilindradas.</p></a>
+    </div>
+  </div>
+</section>
 
 <!-- ===== QUÉ OFRECEMOS (scroll horizontal) ===== -->
 <section class="h-section" id="servicios">
@@ -630,7 +670,7 @@ footer ul a:hover{color:var(--accent)}
       <div class="tl-line"><div class="tl-fill" id="tlFill"></div></div>
       <div class="step"><span class="step-dot">01</span><h3>Cuéntanos qué necesitas</h3><p>Llámanos, escríbenos o rellena el formulario indicando tu vehículo y la pieza que buscas.</p><div class="step-chips"><span>Teléfono</span><span>Email</span><span>Formulario</span></div></div>
       <div class="step"><span class="step-dot">02</span><h3>Te asesoramos</h3><p>Comprobamos la compatibilidad y te proponemos la mejor opción en calidad y precio.</p><div class="step-chips"><span>Compatibilidad</span><span>Mejor opción</span></div></div>
-      <div class="step"><span class="step-dot">03</span><h3>Pide tu presupuesto online</h3><p>Rellena el formulario en un minuto y te enviamos tu presupuesto personalizado, sin compromiso.</p><div class="step-chips"><span>Rápido</span><span>Sin compromiso</span><span><a href="#contacto" style="color:var(--accent)">Pedir presupuesto →</a></span></div></div>
+      <div class="step"><span class="step-dot">03</span><h3>Pide tu presupuesto online</h3><p>Rellena el formulario en un minuto y te enviamos tu presupuesto personalizado, sin compromiso.</p><div class="step-chips"><span>Rápido</span><span>Sin compromiso</span><span><a href="#presupuesto" class="to-form" style="color:var(--accent)">Pedir presupuesto →</a></span></div></div>
     </div>
   </div>
 </section>
@@ -679,18 +719,20 @@ footer ul a:hover{color:var(--accent)}
       </div>
     </div>
 
-    <form class="card reveal d1" id="contactForm" novalidate>
-      <h3>Solicita información</h3>
-      <p class="sub">Los campos marcados con * son obligatorios.</p>
+    <form class="card reveal d1" id="presupuesto" novalidate>
+      <input type="text" name="_honey" id="cHoney" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0" aria-hidden="true">
+      <h3>Pide tu presupuesto</h3>
+      <p class="sub">Te respondemos lo antes posible. Los campos con * son obligatorios.</p>
       <div class="field"><label for="cName">Nombre *</label><input id="cName" autocomplete="name" placeholder="Tu nombre"></div>
       <div class="field"><label for="cPhone">Teléfono</label><input id="cPhone" type="tel" autocomplete="tel" placeholder="600 000 000"></div>
       <div class="field full"><label for="cEmail">Email *</label><input id="cEmail" type="email" autocomplete="email" placeholder="tu@email.com"></div>
-      <div class="field"><label for="cCar">Vehículo</label><input id="cCar" placeholder="Marca, modelo y año"></div>
-      <div class="field"><label for="cTopic">Me interesa</label><select id="cTopic"><option value="">Selecciona una opción</option></select></div>
+      <div class="field"><label for="cSector">Sector</label><select id="cSector"><option value="">Selecciona</option><option>Particular</option><option>Pymes</option><option>Náutica</option><option>Coches</option><option>Motos</option></select></div>
+      <div class="field"><label for="cCar">Vehículo / embarcación</label><input id="cCar" placeholder="Marca, modelo y año"></div>
+      <div class="field full"><label for="cTopic">Me interesa</label><select id="cTopic"><option value="">Selecciona una opción</option></select></div>
       <div class="field full"><label for="cMsg">Mensaje *</label><textarea id="cMsg" placeholder="¿En qué podemos ayudarte?"></textarea></div>
       <label class="consent"><input type="checkbox" id="cOk"> <span>He leído y acepto la <a href="https://www.shop.org.es/politica-de-privacidad/">política de privacidad</a>. Mis datos se usarán solo para responder a mi consulta y puedo revocar mi consentimiento en cualquier momento. *</span></label>
       <p class="form-msg" id="formMsg" role="status"></p>
-      <button class="btn btn-primary btn-lg" type="submit">Enviar consulta <svg class="arr" width="18" height="18"><use href="#i-arrow"/></svg></button>
+      <button class="btn btn-primary btn-lg" type="submit" id="cSend">Enviar solicitud <svg class="arr" width="18" height="18"><use href="#i-arrow"/></svg></button>
     </form>
   </div>
 </section>
@@ -850,11 +892,11 @@ track.addEventListener('click',e=>{
   const c=e.target.closest('.cat');if(!c)return;
   $('#cTopic').value=c.dataset.name;
   if(!$('#cMsg').value)$('#cMsg').value='Hola, me gustaría recibir información sobre '+c.dataset.name.toLowerCase()+'.';
-  document.getElementById('contacto').scrollIntoView({behavior:reduce?'auto':'smooth'});
+  $('#presupuesto').scrollIntoView({behavior:reduce?'auto':'smooth'});
   setTimeout(()=>$('#cName').focus({preventScroll:true}),900);
 });
 // spotlight
-$$('.cat,.b').forEach(el=>el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();el.style.setProperty('--mx',(e.clientX-r.left)+'px');el.style.setProperty('--my',(e.clientY-r.top)+'px')}));
+$$('.cat,.b,.sector').forEach(el=>el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();el.style.setProperty('--mx',(e.clientX-r.left)+'px');el.style.setProperty('--my',(e.clientY-r.top)+'px')}));
 
 /* ========== PALABRAS (Quiénes somos) ========== */
 const ab=$('#aboutBig');
@@ -993,7 +1035,7 @@ layout();
 /* ========== BUCLE PRINCIPAL ========== */
 const header=$('#header'),mq=$('#mqSkew'),rpmEl=$('#rpm'),tl=$('#tl'),tlFill=$('#tlFill'),steps=$$('.step'),callbar=$('#callbar');
 const navLinks=$$('.menu a');
-const secs=['servicios','por-que','como-trabajamos','nosotros','contacto'].map(id=>document.getElementById(id));
+const secs=['sectores','servicios','por-que','como-trabajamos','nosotros','contacto'].map(id=>document.getElementById(id));
 let lastY=scrollY,vel=0,rpm=.8,lastT=performance.now(),lastWordP=-1,lastDir=0;
 function frame(t){
   const dt=Math.min((t-lastT)/1000,.05);lastT=t;
@@ -1081,10 +1123,18 @@ function toggleMenu(o){mnav.classList.toggle('open',o);burger.setAttribute('aria
 burger.onclick=()=>toggleMenu(!mnav.classList.contains('open'));
 mnav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>toggleMenu(false)));
 
-/* ========== FORMULARIO ========== */
-$('#contactForm').addEventListener('submit',e=>{
+/* ========== FORMULARIO (envío a NKautomocion@gmail.com) ========== */
+const FORM_ENDPOINT='https://formsubmit.co/ajax/nkautomocion@gmail.com';
+const form=$('#presupuesto');
+function goForm(sector){
+  if(sector)$('#cSector').value=sector;
+  form.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
+  setTimeout(()=>$('#cName').focus({preventScroll:true}),900);
+}
+document.addEventListener('click',e=>{const a=e.target.closest('.to-form');if(!a)return;e.preventDefault();goForm(a.dataset.sector)});
+form.addEventListener('submit',async e=>{
   e.preventDefault();
-  const msg=$('#formMsg'),f={n:$('#cName'),m:$('#cEmail'),t:$('#cMsg')};
+  const msg=$('#formMsg'),btn=$('#cSend'),f={n:$('#cName'),m:$('#cEmail'),t:$('#cMsg')};
   Object.values(f).forEach(x=>x.parentElement.classList.remove('err'));
   const bad=[];
   if(!f.n.value.trim())bad.push(f.n);
@@ -1092,9 +1142,25 @@ $('#contactForm').addEventListener('submit',e=>{
   if(!f.t.value.trim())bad.push(f.t);
   bad.forEach(x=>x.parentElement.classList.add('err'));
   if(bad.length||!$('#cOk').checked){msg.className='form-msg ko';msg.textContent=bad.length?'Revisa los campos marcados en rojo.':'Debes aceptar la política de privacidad.';(bad[0]||$('#cOk')).focus();return}
-  const body=`Nombre: ${f.n.value}\nEmail: ${f.m.value}\nTeléfono: ${$('#cPhone').value}\nVehículo: ${$('#cCar').value}\nInterés: ${$('#cTopic').value}\n\n${f.t.value}`;
-  location.href='mailto:nkautomocion@gmail.com?subject='+encodeURIComponent('Consulta web – '+f.n.value)+'&body='+encodeURIComponent(body);
-  msg.className='form-msg ok';msg.textContent='¡Gracias! Se abrirá tu aplicación de correo para enviar la consulta.';
+  if($('#cHoney').value)return;
+  const data={
+    _subject:'Nueva solicitud de presupuesto – '+f.n.value.trim(),
+    _template:'table',_captcha:'false',_replyto:f.m.value.trim(),
+    'Nombre':f.n.value.trim(),'Email':f.m.value.trim(),'Teléfono':$('#cPhone').value.trim()||'-',
+    'Sector':$('#cSector').value||'-','Vehículo / embarcación':$('#cCar').value.trim()||'-',
+    'Me interesa':$('#cTopic').value||'-','Mensaje':f.t.value.trim()
+  };
+  const label=btn.innerHTML;btn.disabled=true;btn.textContent='Enviando…';msg.className='form-msg';
+  try{
+    const r=await fetch(FORM_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||String(j.success)==='false')throw new Error(j.message||'error');
+    form.reset();
+    msg.className='form-msg ok';msg.textContent='¡Solicitud enviada! Te contactaremos lo antes posible.';
+  }catch(err){
+    msg.className='form-msg ko';
+    msg.innerHTML='No se ha podido enviar ahora mismo. Llámanos al <a href="tel:+34922293649" style="color:inherit;text-decoration:underline">922 29 36 49</a> o escríbenos a <a href="mailto:nkautomocion@gmail.com" style="color:inherit;text-decoration:underline">nkautomocion@gmail.com</a>.';
+  }finally{btn.disabled=false;btn.innerHTML=label}
 });
 
 /* ========== COOKIES ========== */
