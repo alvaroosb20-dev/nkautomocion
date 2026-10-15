@@ -1171,10 +1171,11 @@ form.addEventListener('submit',async e=>{
   try{
     const r=await post();
     const j=await r.json().catch(()=>({}));
-    if(!r.ok||String(j.success)==='false')throw new Error(j.message||'error');
+    if(!r.ok||String(j.success)==='false'){console.warn('FormSubmit:',j);throw new Error(j.message||'error')}
     form.reset();
     msg.className='form-msg ok';msg.textContent='¡Solicitud enviada! Te contactaremos lo antes posible.';
   }catch(err){
+    if(/activ/i.test(err.message||'')){msg.className='form-msg ko';msg.textContent='El formulario está pendiente de activación. Revisa el email de FormSubmit en nkautomocion@gmail.com y pulsa «Activate Form».';return}
     msg.className='form-msg ko';
     msg.innerHTML='No se ha podido enviar ahora mismo. Llámanos al <a href="tel:+34922293649" style="color:inherit;text-decoration:underline">922 29 36 49</a> o escríbenos por <a href="https://wa.me/'+WA_NUMBER+'" style="color:inherit;text-decoration:underline">WhatsApp</a>.';
   }finally{btn.disabled=false;btn.innerHTML=label}
