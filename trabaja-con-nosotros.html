@@ -345,6 +345,14 @@ form.card .btn[disabled]{opacity:.7;pointer-events:none}
 .form-msg.ok{display:block;background:rgba(126,226,160,.08);color:#7ee2a0;border:1px solid rgba(126,226,160,.2)}
 .form-msg.ko{display:block;background:rgba(255,107,107,.08);color:#ff8f8f;border:1px solid rgba(255,107,107,.2)}
 form.card .btn{grid-column:1/-1;width:100%}
+.cv-drop{position:relative;display:flex;align-items:center;gap:16px;padding:18px;border:1.5px dashed var(--line-2);border-radius:14px;background:var(--bg);cursor:pointer;transition:border-color .25s,background .25s}
+.cv-drop:hover,.cv-drop.drag{border-color:var(--accent);background:rgba(242,198,55,.05)}
+.cv-drop.has{border-style:solid;border-color:rgba(126,226,160,.5)}
+.cv-drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.cv-drop b{display:block;font-size:.95rem}
+.cv-drop small{color:var(--muted);font-size:.8rem}
+.cv-drop .x{margin-left:auto;position:relative;z-index:2;width:30px;height:30px;border-radius:50%;border:1px solid var(--line-2);display:none;place-items:center;color:var(--muted)}
+.cv-drop.has .x{display:grid}
 .btn-wa{background:#25d366;color:#06200f;box-shadow:0 10px 40px -10px rgba(37,211,102,.5)}
 .btn-wa:hover{background:#3ee07b}
 
@@ -467,13 +475,21 @@ footer ul a:hover{color:var(--accent)}
 .job-steps{list-style:none;margin-top:34px;display:flex;flex-direction:column;gap:14px;counter-reset:j}
 .job-steps li{display:flex;gap:16px;align-items:flex-start;color:var(--soft)}
 .job-steps li::before{counter-increment:j;content:counter(j);flex:none;width:34px;height:34px;border-radius:50%;background:rgba(242,198,55,.12);color:var(--accent);display:grid;place-items:center;font-family:var(--mono);font-size:.8rem}
+.cv-drop{position:relative;display:flex;align-items:center;gap:16px;padding:18px;border:1.5px dashed var(--line-2);border-radius:14px;background:var(--bg);cursor:pointer;transition:border-color .25s,background .25s}
+.cv-drop:hover,.cv-drop.drag{border-color:var(--accent);background:rgba(242,198,55,.05)}
+.cv-drop.has{border-style:solid;border-color:rgba(126,226,160,.5)}
+.cv-drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.cv-drop b{display:block;font-size:.95rem}
+.cv-drop small{color:var(--muted);font-size:.8rem}
+.cv-drop .x{margin-left:auto;position:relative;z-index:2;width:30px;height:30px;border-radius:50%;border:1px solid var(--line-2);display:none;place-items:center;color:var(--muted)}
+.cv-drop.has .x{display:grid}
 .btn-wa{background:#25d366;color:#06200f;box-shadow:0 10px 40px -10px rgba(37,211,102,.5)}
 .btn-wa:hover{background:#3ee07b}
 .simple-foot{border-top:1px solid var(--line);padding:34px 0;color:var(--muted);font-size:.85rem}
 .simple-foot .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
 .simple-foot a:hover{color:var(--accent)}
 @media (max-width:1000px){.perks,.areas{grid-template-columns:1fr 1fr}.job-form-wrap{grid-template-columns:1fr;gap:44px}}
-@media (max-width:760px){.job-hero{padding:120px 0 70px}.perks,.areas{grid-template-columns:1fr}.perk{padding:26px}.nav-back span{display:none}}
+@media (max-width:760px){.job-hero{padding:120px 0 70px}.perks,.areas{grid-template-columns:1fr}.perk{padding:26px}.nav-back span{display:none}.nav-call span{display:none}.nav-actions .btn-sm{padding:0 13px}}
 </style>
 
 </head>
@@ -495,7 +511,7 @@ footer ul a:hover{color:var(--accent)}
     <a href="./" class="logo" aria-label="NK Automoción, inicio"><span class="nk-box">NK</span><span class="nk-word">AUTOMOCIÓN</span></a>
     <div class="nav-actions" style="gap:10px">
       <a class="btn btn-ghost btn-sm nav-back" href="./" style="display:inline-flex"><svg width="16" height="16" style="transform:rotate(180deg)"><use href="#i-arrow"/></svg><span>Volver a la web</span></a>
-      <a class="btn btn-primary btn-sm" href="tel:+34922293649" style="display:inline-flex"><svg width="16" height="16"><use href="#i-phone"/></svg>Llamar</a>
+      <a class="btn btn-primary btn-sm nav-call" href="tel:+34922293649" style="display:inline-flex" aria-label="Llamar"><svg width="16" height="16"><use href="#i-phone"/></svg><span>Llamar</span></a>
     </div>
   </div>
 </header>
@@ -543,11 +559,11 @@ footer ul a:hover{color:var(--accent)}
     <div class="reveal">
       <span class="eyebrow">Candidatura</span>
       <h2>Envíanos tu <span class="y">candidatura</span></h2>
-      <p class="lead" style="margin-top:22px;color:var(--muted);font-size:1rem">Rellena el formulario y se enviará por WhatsApp con todos tus datos.</p>
+      <p class="lead" style="margin-top:22px;color:var(--muted);font-size:1rem">Rellena el formulario, adjunta tu CV y se enviará por WhatsApp con todos tus datos.</p>
       <ol class="job-steps">
-        <li>Rellena tus datos y el área que te interesa.</li>
+        <li>Rellena tus datos, el área que te interesa y adjunta tu CV.</li>
         <li>Pulsa «Enviar por WhatsApp» y envía el mensaje.</li>
-        <li>Adjunta tu CV en el mismo chat de WhatsApp (PDF o foto).</li>
+        <li>Tu CV nos llega con el mensaje, listo para abrir.</li>
       </ol>
     </div>
     <form class="card reveal d1" id="jobForm" novalidate>
@@ -562,9 +578,17 @@ footer ul a:hover{color:var(--accent)}
       <div class="field"><label for="jExp">Experiencia</label><select id="jExp"><option value="">Selecciona</option><option>Sin experiencia</option><option>Menos de 1 año</option><option>1 a 3 años</option><option>3 a 5 años</option><option>Más de 5 años</option></select></div>
       <div class="field full"><label for="jAvail">Disponibilidad</label><select id="jAvail"><option value="">Selecciona</option><option>Inmediata</option><option>En 15 días</option><option>En 1 mes</option><option>A convenir</option></select></div>
       <div class="field full"><label for="jMsg">Cuéntanos sobre ti *</label><textarea id="jMsg" placeholder="Tu experiencia, qué te motiva, carnet de conducir, etc."></textarea></div>
+      <div class="field full"><label>Tu CV (PDF, Word o foto · máx. 10 MB)</label>
+        <label class="cv-drop" id="cvDrop">
+          <input type="file" id="jCv" accept=".pdf,.doc,.docx,image/*">
+          <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg></span>
+          <span><b id="cvName">Adjunta tu CV</b><small id="cvHint">Pulsa aquí o arrastra el archivo</small></span>
+          <button type="button" class="x" id="cvClear" aria-label="Quitar archivo">✕</button>
+        </label>
+      </div>
       <label class="consent"><input type="checkbox" id="jOk"> <span>He leído y acepto la <a href="https://www.shop.org.es/politica-de-privacidad/">política de privacidad</a>. Mis datos se usarán solo para gestionar mi candidatura. *</span></label>
       <p class="form-msg" id="jMsgBox" role="status"></p>
-      <button class="btn btn-lg btn-wa" type="submit"><svg width="20" height="20"><use href="#i-chat"/></svg>Enviar por WhatsApp</button>
+      <button class="btn btn-lg btn-wa" type="submit" id="jSend"><svg width="20" height="20"><use href="#i-chat"/></svg>Enviar por WhatsApp</button>
     </form>
   </div>
 </section>
@@ -594,18 +618,52 @@ $('#jArea').innerHTML+=AREAS.map(a=>`<option>${a[0]}</option>`).join('')+'<optio
 $('#areas').addEventListener('click',e=>{const b=e.target.closest('.area');if(!b)return;$('#jArea').value=b.dataset.area;document.getElementById('candidatura').scrollIntoView({behavior:'smooth'});setTimeout(()=>$('#jName').focus({preventScroll:true}),800)});
 const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-$('#jobForm').addEventListener('submit',e=>{
+// ---- CV
+const SB_URL='https://blrqwjthifbyctdydmze.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscnF3anRoaWZieWN0ZHlkbXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNzMyODksImV4cCI6MjEwNzY0OTI4OX0.zuewhrZfLxi1CPbCLcqbqae9avch4THNzf8vwFeWSsg';
+const MAX=10*1024*1024, cvIn=$('#jCv'), drop=$('#cvDrop');
+function showCv(){
+  const f=cvIn.files[0];
+  if(f&&f.size>MAX){cvIn.value='';$('#cvName').textContent='Archivo demasiado grande';$('#cvHint').textContent='Máximo 10 MB';drop.classList.remove('has');return}
+  drop.classList.toggle('has',!!f);
+  $('#cvName').textContent=f?f.name:'Adjunta tu CV';
+  $('#cvHint').textContent=f?(f.size/1024/1024).toFixed(1)+' MB · listo para enviar':'Pulsa aquí o arrastra el archivo';
+}
+cvIn.addEventListener('change',showCv);
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.add('drag')));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('drag')));
+$('#cvClear').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();cvIn.value='';showCv()});
+async function uploadCv(file,name){
+  const ext=(file.name.split('.').pop()||'pdf').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const slug=name.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)||'cv';
+  const id=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));
+  const path=`candidaturas/${new Date().toISOString().slice(0,10)}-${slug}-${id}.${ext}`;
+  const r=await fetch(`${SB_URL}/storage/v1/object/cvs/${path}`,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':file.type||'application/octet-stream','x-upsert':'false'},body:file});
+  if(!r.ok)throw new Error('upload '+r.status);
+  return `${SB_URL}/storage/v1/object/public/cvs/${path}`;
+}
+
+$('#jobForm').addEventListener('submit',async e=>{
   e.preventDefault();
-  const box=$('#jMsgBox'),req=[$('#jName'),$('#jPhone'),$('#jArea'),$('#jMsg')];
+  const box=$('#jMsgBox'),btn=$('#jSend'),req=[$('#jName'),$('#jPhone'),$('#jArea'),$('#jMsg')];
   req.forEach(x=>x.parentElement.classList.remove('err'));
   const bad=req.filter(x=>!x.value.trim());
   const em=$('#jEmail').value.trim();if(em&&!/^\S+@\S+\.\S+$/.test(em))bad.push($('#jEmail'));
   bad.forEach(x=>x.parentElement.classList.add('err'));
   if(bad.length||!$('#jOk').checked){box.className='form-msg ko';box.textContent=bad.length?'Revisa los campos marcados en rojo.':'Debes aceptar la política de privacidad.';(bad[0]||$('#jOk')).focus();return}
   if($('#jHoney').value)return;
+  let cvUrl='';
+  const file=cvIn.files[0];
+  if(file){
+    const label=btn.innerHTML;btn.disabled=true;btn.textContent='Subiendo CV…';box.className='form-msg';
+    try{cvUrl=await uploadCv(file,$('#jName').value.trim())}
+    catch(err){btn.disabled=false;btn.innerHTML=label;box.className='form-msg ko';box.textContent='No se ha podido subir el CV. Inténtalo de nuevo o envía la candidatura sin archivo y mándalo por WhatsApp.';cvIn.value='';showCv();return}
+    btn.disabled=false;btn.innerHTML=label;
+  }
   const f={'Nombre':$('#jName').value.trim(),'Teléfono':$('#jPhone').value.trim(),'Email':em||'-','Localidad':$('#jCity').value.trim()||'-','Área':$('#jArea').value,'Experiencia':$('#jExp').value||'-','Disponibilidad':$('#jAvail').value||'-','Sobre mí':$('#jMsg').value.trim()};
-  const txt='*Candidatura – Trabaja con nosotros (NK Automoción)*\n\n'+Object.entries(f).map(([k,v])=>`*${k}:* ${v}`).join('\n')+'\n\n_Adjunto mi CV a continuación._';
-  box.className='form-msg ok';box.textContent='Abriendo WhatsApp… pulsa Enviar y adjunta tu CV en el chat.';
+  if(cvUrl)f['CV']=cvUrl;
+  const txt='*Candidatura – Trabaja con nosotros (NK Automoción)*\n\n'+Object.entries(f).map(([k,v])=>`*${k}:* ${v}`).join('\n')+(cvUrl?'':'\n\n_Adjunto mi CV a continuación._');
+  box.className='form-msg ok';box.textContent=cvUrl?'CV subido ✓ Abriendo WhatsApp… pulsa Enviar.':'Abriendo WhatsApp… pulsa Enviar y adjunta tu CV en el chat.';
   location.href='https://wa.me/'+WA_NUMBER+'?text='+encodeURIComponent(txt);
 });
 $('#year').textContent=new Date().getFullYear();
