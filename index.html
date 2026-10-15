@@ -260,7 +260,7 @@ section{padding:150px 0;position:relative}
 .scan.go .scan-ok{opacity:1;transform:none}
 .big-num{font-family:var(--display);font-size:clamp(3.4rem,4.4vw,4.8rem);font-weight:800;line-height:.85;margin-bottom:12px}
 .big-num i{font-style:normal;color:var(--accent)}
-.road{position:absolute;right:-20px;top:40px;width:62%;height:120px;opacity:.9}
+.road{display:block;width:calc(100% + 60px);margin:18px -30px auto;height:auto;max-height:120px}
 .road .lane{stroke-dasharray:14 12;animation:lane .8s linear infinite}
 @keyframes lane{to{stroke-dashoffset:-26}}
 .live-big{display:flex;align-items:center;gap:12px;margin-bottom:auto;padding-bottom:30px}
@@ -637,8 +637,17 @@ footer ul a:hover{color:var(--accent)}
         <p>Asistencia inmediata para resolver tus dudas.</p>
       </div>
       <div class="b reveal d2">
-        <svg class="road" viewBox="0 0 300 120" fill="none" aria-hidden="true"><path d="M0 100 C 90 100, 140 30, 300 30" stroke="#2e333a" stroke-width="22" stroke-linecap="round"/><path class="lane" d="M0 100 C 90 100, 140 30, 300 30" stroke="#f2c637" stroke-width="2.5"/></svg>
-        <div class="b-tag">Entrega</div>
+        <div class="b-tag" style="padding-bottom:0">Entrega</div>
+        <svg class="road" viewBox="0 0 400 110" fill="none" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <defs><linearGradient id="roadFade" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".15" stop-color="#fff"/><stop offset=".85" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="roadMask"><rect width="400" height="110" fill="url(#roadFade)"/></mask></defs>
+          <g mask="url(#roadMask)">
+            <path id="roadPath" d="M-10 80 C 110 80, 150 30, 260 30 S 380 55, 410 55" stroke="#262a30" stroke-width="26" stroke-linecap="round"/>
+            <path d="M-10 80 C 110 80, 150 30, 260 30 S 380 55, 410 55" stroke="#30353d" stroke-width="26" stroke-linecap="round" stroke-dasharray="0" opacity=".0"/>
+            <path class="lane" d="M-10 80 C 110 80, 150 30, 260 30 S 380 55, 410 55" stroke="#f2c637" stroke-width="2.5"/>
+            <circle r="5" fill="#fff"><animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#roadPath"/></animateMotion></circle>
+            <circle r="12" fill="rgba(242,198,55,.35)"><animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#roadPath"/></animateMotion></circle>
+          </g>
+        </svg>
         <h3>Envíos rápidos</h3>
         <p>Entregas fiables para que tu vehículo esté siempre listo.</p>
       </div>
