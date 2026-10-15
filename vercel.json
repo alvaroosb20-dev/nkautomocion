@@ -1,0 +1,15 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    { "source": "/(.*)", "headers": [
+      { "key": "X-Content-Type-Options", "value": "nosniff" },
+      { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+      { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
+    ]},
+    { "source": "/admin", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] },
+    { "source": "/seguimiento", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, follow" } ] },
+    { "source": "/supabase/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex" } ] },
+    { "source": "/(.*)\\.(jpg|png|svg|webmanifest)", "headers": [ { "key": "Cache-Control", "value": "public, max-age=604800" } ] }
+  ]
+}
