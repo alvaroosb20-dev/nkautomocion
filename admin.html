@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Panel de seguimiento · NK Automoción</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#08090b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23f2c637'/%3E%3Ctext x='31' y='43' font-family='Arial Black,Arial' font-weight='900' font-style='italic' font-size='30' text-anchor='middle' fill='%230b0b0b'%3ENK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Montserrat:ital,wght@0,800;1,900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="nk-app.css">
+<style>
+/* Login */
+.auth{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(700px 500px at 80% 0%,rgba(242,198,55,.12),transparent 70%)}
+.auth-box{width:min(420px,100%)}
+.auth-box .logo{display:flex;width:max-content;margin-bottom:30px}
+.auth-box h1{font-size:2.4rem;margin-bottom:6px}
+.auth-box form{display:flex;flex-direction:column;gap:14px;margin-top:26px}
+.auth-links{display:flex;justify-content:space-between;gap:10px;margin-top:16px;font-size:.86rem}
+.auth-links button{color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.auth-links button:hover{color:var(--text)}
+
+/* App shell */
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px}
+.tabs button{padding:8px 14px;border-radius:9px;font-size:.88rem;color:var(--soft)}
+.tabs button.on{background:var(--accent);color:var(--ink);font-weight:600}
+.user{font-size:.8rem;color:var(--muted);font-family:var(--mono);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{padding:28px 0 80px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.bar .field{flex:1;min-width:160px}
+.bar .field.sm{flex:0 0 190px}
+.seg{display:flex;border:1px solid var(--line-2);border-radius:11px;overflow:hidden;height:48px}
+.seg button{padding:0 14px;font-size:.86rem;color:var(--soft)}
+.seg button.on{background:var(--card-2);color:var(--text);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat{padding:18px 20px}
+.stat b{font-family:var(--display);font-size:2.4rem;line-height:1;display:block}
+.stat span{color:var(--muted);font-size:.82rem}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:grid;grid-template-columns:150px 1.4fr 1fr 170px 130px;gap:16px;align-items:center;padding:16px 18px;cursor:pointer;transition:border-color .2s,background .2s;text-align:left;width:100%}
+.row:hover{border-color:var(--line-2);background:var(--card-2)}
+.row .pl{font-family:var(--mono);font-weight:500;letter-spacing:.06em;font-size:1rem}
+.row .mm{font-weight:600}
+.row .cl{color:var(--muted);font-size:.84rem}
+.row .when{color:var(--muted);font-size:.8rem;text-align:right}
+.mini{height:6px;border-radius:9px;background:var(--bg);overflow:hidden;margin-top:6px}
+.mini i{display:block;height:100%;background:var(--c,var(--accent));border-radius:9px}
+.empty{padding:50px 20px;text-align:center;color:var(--muted)}
+
+/* Drawer */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80;opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(720px,100%);background:var(--bg-2);border-left:1px solid var(--line);z-index:90;transform:translateX(100%);transition:transform .45s var(--ease);display:flex;flex-direction:column}
+.drawer.on{transform:none}
+.d-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:20px 24px;border-bottom:1px solid var(--line)}
+.d-head h2{font-size:1.9rem}
+.d-body{flex:1;overflow:auto;padding:22px 24px 40px;display:flex;flex-direction:column;gap:16px}
+.x{width:40px;height:40px;border-radius:10px;border:1px solid var(--line-2);display:grid;place-items:center;flex:none}
+.sec-t{font-family:var(--display);text-transform:uppercase;font-size:1.35rem;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:8px 14px;font-size:.9rem}
+.kv span{color:var(--muted)}
+.code{font-family:var(--mono);font-size:1.3rem;letter-spacing:.18em;color:var(--accent)}
+.slider-row{display:flex;align-items:center;gap:14px}
+.slider-row input[type=range]{flex:1;accent-color:var(--accent);height:30px}
+.slider-row .num{width:84px}
+.pv{font-family:var(--display);font-size:2.6rem;font-weight:800;min-width:90px;text-align:right}
+.notify{border-color:rgba(37,211,102,.4)}
+.h-item{padding:14px 0;border-bottom:1px solid var(--line);font-size:.88rem}
+.h-item:last-child{border-bottom:0}
+.h-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.h-top b{font-weight:600}
+.h-meta{color:var(--muted);font-size:.78rem;font-family:var(--mono)}
+.h-item p{margin-top:5px;color:var(--soft)}
+.h-item .priv{color:#fbbf24}
+.h-item img{margin-top:8px;width:120px;border-radius:8px;border:1px solid var(--line)}
+.tag{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:2px 7px;border-radius:5px;background:var(--card-2);color:var(--muted);border:1px solid var(--line-2)}
+.tag.vis{color:var(--ok);border-color:rgba(52,211,153,.35)}
+.privbox{white-space:pre-line;font-size:.86rem;color:var(--soft);background:var(--bg);border:1px dashed var(--line-2);border-radius:10px;padding:12px;max-height:180px;overflow:auto}
+.thumb{width:100%;max-height:220px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
+
+/* Modal */
+.modal{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.7)}
+.modal .box{width:min(760px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--bg-2);border:1px solid var(--line-2);border-radius:20px}
+.modal .box>header{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg-2);z-index:2}
+.modal .box>header h2{font-size:1.8rem}
+.modal form{padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.modal footer{grid-column:1/-1;display:flex;justify-content:flex-end;gap:10px;padding-top:8px}
+.confirm .box{width:min(460px,100%);padding:26px}
+.confirm h3{font-size:1.6rem;margin-bottom:8px}
+.confirm p{color:var(--soft);font-size:.92rem;margin-bottom:16px}
+
+/* Settings */
+.st-table{width:100%;border-collapse:collapse;font-size:.88rem}
+.st-table th{text-align:left;color:var(--muted);font-weight:500;font-size:.76rem;text-transform:uppercase;letter-spacing:.08em;padding:8px}
+.st-table td{padding:6px 8px;vertical-align:top;border-top:1px solid var(--line)}
+.st-table input,.st-table textarea{width:100%;background:var(--bg);border:1px solid var(--line-2);color:var(--text);padding:9px 10px;border-radius:8px;font:inherit;font-size:.86rem}
+.st-table textarea{min-height:42px;resize:vertical}
+.st-table input[type=color]{padding:2px;height:38px;width:48px}
+.st-table input[type=number]{width:72px}
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cards-m{display:none}
+
+@media (max-width:980px){
+  .row{grid-template-columns:110px 1fr 140px}
+  .row .cl,.row .when{display:none}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .set-grid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .top .wrap{height:64px}
+  .tabs button{padding:7px 10px;font-size:.8rem}
+  .user{display:none}
+  #appView .nk-word{display:none}
+  #logout{padding:0 10px}
+  .row{grid-template-columns:1fr auto;gap:8px 12px}
+  .row .pl{grid-column:1}
+  .row .mm{grid-column:1;font-size:.9rem}
+  .row>div:nth-child(4){grid-column:1/-1}
+  .row .bd{grid-column:2;grid-row:1/3;justify-self:end}
+  .bar .field.sm{flex:1 1 46%}
+  .modal form{grid-template-columns:1fr}
+  .kv{grid-template-columns:1fr}
+  .d-head,.d-body{padding-left:16px;padding-right:16px}
+  .st-table thead{display:none}
+  .st-table tr{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:12px 0;border-top:1px solid var(--line)}
+  .st-table td{border:0;padding:0}
+  .st-table td.wide{grid-column:1/-1}
+}
+</style>
+</head>
+<body>
+
+<!-- ======= ACCESO ======= -->
+<section class="auth" id="authView" hidden>
+  <div class="auth-box">
+    <a href="./" class="logo"><span class="nk-box">NK</span><span class="nk-word">AUTOMOCIÓN</span></a>
+    <span class="eyebrow">Acceso privado</span>
+    <h1 id="authTitle">Panel de seguimiento</h1>
+    <p class="muted" id="authSub">Accede con tu cuenta de administrador.</p>
+    <form id="authForm" novalidate>
+      <div class="field" id="fEmailWrap"><label for="aEmail">Email</label><input id="aEmail" type="email" autocomplete="email" required></div>
+      <div class="field" id="fPassWrap"><label for="aPass">Contraseña</label><input id="aPass" type="password" autocomplete="current-password" minlength="8" required></div>
+      <div id="authMsg"></div>
+      <button class="btn btn-primary" type="submit" id="authBtn">Entrar</button>
+    </form>
+    <div class="auth-links">
+      <button type="button" id="toSignup">Crear cuenta de administrador</button>
+      <button type="button" id="toReset">¿Olvidaste la contraseña?</button>
+    </div>
+  </div>
+</section>
+
+<!-- ======= SIN PERMISOS ======= -->
+<section class="auth" id="denyView" hidden>
+  <div class="auth-box card pad">
+    <span class="eyebrow">Acceso restringido</span>
+    <h1 style="font-size:2rem;margin:12px 0">Sin permisos</h1>
+    <p class="muted" id="denyTxt">Tu cuenta no tiene permisos para gestionar el seguimiento.</p>
+    <div class="acts" style="margin-top:20px"><button class="btn btn-ghost btn-sm" id="denyOut">Cerrar sesión</button><a class="btn btn-ghost btn-sm" href="./">Ir a la web</a></div>
+  </div>
+</section>
+
+<!-- ======= APP ======= -->
+<div id="appView" hidden>
+  <header class="top">
+    <div class="wrap">
+      <a href="./" class="logo" aria-label="Ir a la web"><span class="nk-box">NK</span><span class="nk-word">AUTOMOCIÓN</span></a>
+      <div class="tabs" role="tablist">
+        <button class="on" data-tab="vehicles">Vehículos</button>
+        <button data-tab="settings" id="tabSettings">Ajustes</button>
+      </div>
+      <div class="top-actions"><span class="user" id="userEmail"></span><button class="btn btn-ghost btn-sm" id="logout">Salir</button></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <!-- VEHÍCULOS -->
+      <section id="tab-vehicles">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+          <div><span class="eyebrow">Gestión</span><h1 style="font-size:2.6rem;margin-top:8px">Vehículos</h1></div>
+          <div class="acts"><span class="live" id="adminLive"><i></i><span>Conectando…</span></span><button class="btn btn-primary" id="newBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Registrar vehículo</button></div>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="bar">
+          <div class="field"><input id="qPlate" class="plate-input" placeholder="Buscar matrícula" autocomplete="off" aria-label="Buscar por matrícula"></div>
+          <div class="field sm"><select id="qStatus" aria-label="Filtrar por estado"><option value="">Todos los estados</option></select></div>
+          <div class="field sm"><select id="qSort" aria-label="Ordenar"><option value="updated_at">Última actualización</option><option value="entry_date">Fecha de entrada</option></select></div>
+          <div class="seg" role="tablist"><button class="on" data-arch="0">Activos</button><button data-arch="1">Archivados</button></div>
+        </div>
+        <div class="list" id="list"></div>
+      </section>
+
+      <!-- AJUSTES -->
+      <section id="tab-settings" hidden>
+        <div style="margin-bottom:20px"><span class="eyebrow">Configuración</span><h1 style="font-size:2.6rem;margin-top:8px">Ajustes</h1></div>
+        <div class="card pad" style="margin-bottom:16px">
+          <div class="sec-t">Estados del vehículo<button class="btn btn-ghost btn-sm" id="addStatus">+ Añadir estado</button></div>
+          <p class="muted" style="font-size:.86rem;margin-bottom:14px">Personaliza el nombre, la descripción que ve el cliente, el color y el % sugerido de cada estado. Desactiva los que no uses.</p>
+          <div style="overflow:auto"><table class="st-table"><thead><tr><th>Orden</th><th>Nombre</th><th>Descripción para el cliente</th><th>Color</th><th>% sugerido</th><th>Activo</th></tr></thead><tbody id="stBody"></tbody></table></div>
+          <div class="acts" style="margin-top:16px;justify-content:flex-end"><button class="btn btn-primary btn-sm" id="saveStatuses">Guardar estados</button></div>
+        </div>
+        <div class="set-grid">
+          <div class="card pad">
+            <div class="sec-t">Notificaciones</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <label class="check"><input type="checkbox" id="nEnabled"> Activar avisos al cliente</label>
+              <label class="check"><input type="checkbox" id="nStatus"> Avisar cuando cambie el estado</label>
+              <label class="check"><input type="checkbox" id="nReady"> Avisar cuando esté listo para entregar</label>
+              <p class="muted" style="font-size:.82rem">Al guardar una actualización que cumpla estas condiciones, el panel te ofrecerá enviar el aviso por WhatsApp o email con el enlace de seguimiento. Cada aviso queda registrado.</p>
+            </div>
+          </div>
+          <div class="card pad">
+            <div class="sec-t">Marca</div>
+            <div class="field"><label for="brandColor">Color corporativo (página del cliente)</label><input type="color" id="brandColor"></div>
+            <div class="sec-t" style="margin-top:22px">Administradores</div>
+            <div class="field"><label for="adminEmails">Emails que serán administradores al crear su cuenta</label><textarea id="adminEmails" placeholder="uno por línea"></textarea></div>
+            <div id="usersList" style="margin-top:14px"></div>
+          </div>
+        </div>
+        <div class="acts" style="margin-top:16px;justify-content:flex-end"><button class="btn btn-primary" id="saveSettings">Guardar ajustes</button></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- DRAWER -->
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" aria-label="Detalle del vehículo"></aside>
+<div class="toasts" id="toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="nk-config.js"></script>
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const {esc,icon,fDate,fShort,fDateTime,fRel,photoUrl,trackingLink,waPhone}=NK;
+let sb;
+try{ sb=NK.client({auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}) }
+catch(e){ document.body.innerHTML='<div class="auth"><div class="msg ko">No se pudo cargar el sistema. Revisa tu conexión y recarga la página.</div></div>'; return }
+
+const S={user:null,isAdmin:false,statuses:[],stMap:{},settings:{},vehicles:[],arch:false,openId:null,recovery:false};
+const KIND={created:'Registro',progress:'Progreso',edit:'Edición',archived:'Archivado',restored:'Reactivado'};
+const FIELD={plate:'Matrícula',make_model:'Marca y modelo',client_ref:'Cliente',client_phone:'Teléfono',client_email:'Email',entry_date:'Fecha de entrada',description:'Descripción',photo_path:'Foto',progress:'Progreso',status:'Estado',eta:'Fecha estimada',public_notes:'Observaciones',private_notes:'Notas privadas',tracking_code:'Código',notify:'Avisos',archived:'Archivado'};
+
+function toast(t,type){const el=document.createElement('div');el.className='toast '+(type||'');el.textContent=t;$('#toasts').appendChild(el);setTimeout(()=>el.remove(),4500)}
+function msg(el,type,text){el.innerHTML=text?`<div class="msg ${type}">${esc(text)}</div>`:''}
+function busy(btn,on){if(!btn)return;btn.classList.toggle('loading',on);btn.disabled=on}
+const st=k=>S.stMap[k]||{label:k||'—',color:'#8f97a3',icon:'dot'};
+const badge=k=>{const s=st(k);return `<span class="badge" style="--c:${esc(s.color)}">${icon(s.icon)}${esc(s.label)}</span>`};
+function errMsg(e){const m=(e&&(e.message||e.error_description))||'';if(/Invalid login/i.test(m))return 'Email o contraseña incorrectos.';if(/Email not confirmed/i.test(m))return 'Tienes que confirmar tu email antes de entrar. Revisa tu bandeja de entrada.';if(/already registered/i.test(m))return 'Ese email ya tiene una cuenta. Inicia sesión o recupera la contraseña.';if(/row-level|permission|No autorizado|42501/i.test(m))return 'No tienes permisos para esta acción.';if(/duplicate/i.test(m))return 'Ya existe un registro con esos datos.';return m||'Ha ocurrido un error. Inténtalo de nuevo.'}
+
+/* ================= AUTENTICACIÓN ================= */
+let authMode='login';
+function setAuthMode(m){
+  authMode=m;$('#authMsg').innerHTML='';
+  const T={login:['Panel de seguimiento','Accede con tu cuenta de administrador.','Entrar'],signup:['Crear cuenta','Solo los emails autorizados tendrán acceso al panel.','Crear cuenta'],reset:['Recuperar acceso','Te enviaremos un enlace para crear una nueva contraseña.','Enviar enlace'],newpass:['Nueva contraseña','Escribe tu nueva contraseña.','Guardar contraseña']}[m];
+  $('#authTitle').textContent=T[0];$('#authSub').textContent=T[1];$('#authBtn').textContent=T[2];
+  $('#fPassWrap').hidden=m==='reset';$('#fEmailWrap').hidden=m==='newpass';
+  $('#aPass').autocomplete=m==='login'?'current-password':'new-password';
+  $('#toSignup').textContent=m==='login'?'Crear cuenta de administrador':'Volver a iniciar sesión';
+  $('#toReset').hidden=m!=='login';
+}
+$('#toSignup').onclick=()=>setAuthMode(authMode==='login'?'signup':'login');
+$('#toReset').onclick=()=>setAuthMode('reset');
+$('#authForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const email=$('#aEmail').value.trim(),pass=$('#aPass').value,btn=$('#authBtn'),box=$('#authMsg');
+  if(authMode!=='newpass'&&!/^\S+@\S+\.\S+$/.test(email))return msg(box,'ko','Introduce un email válido.');
+  if(authMode!=='reset'&&pass.length<8)return msg(box,'ko','La contraseña debe tener al menos 8 caracteres.');
+  busy(btn,true);
+  try{
+    const redirect=location.origin+location.pathname;
+    if(authMode==='login'){const {error}=await sb.auth.signInWithPassword({email,password:pass});if(error)throw error}
+    else if(authMode==='signup'){const {data,error}=await sb.auth.signUp({email,password:pass,options:{emailRedirectTo:redirect}});if(error)throw error;
+      if(!data.session){msg(box,'ok','Cuenta creada. Te hemos enviado un email para confirmarla: ábrelo y vuelve aquí para entrar.');setAuthMode('login');msg($('#authMsg'),'ok','Cuenta creada. Confirma tu email desde el enlace que te hemos enviado y después inicia sesión.')}}
+    else if(authMode==='reset'){const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:redirect});if(error)throw error;msg(box,'ok','Si el email existe, recibirás un enlace para crear una nueva contraseña.')}
+    else if(authMode==='newpass'){const {error}=await sb.auth.updateUser({password:pass});if(error)throw error;S.recovery=false;toast('Contraseña actualizada','ok');await boot()}
+  }catch(err){msg(box,'ko',errMsg(err))}
+  finally{busy(btn,false)}
+});
+sb.auth.onAuthStateChange((ev,session)=>{
+  if(ev==='PASSWORD_RECOVERY'){S.recovery=true;show('auth');setAuthMode('newpass');return}
+  if(ev==='SIGNED_IN'&&!S.recovery&&!S.user)boot();
+  if(ev==='SIGNED_OUT'){S.user=null;show('auth');setAuthMode('login')}
+});
+async function logout(){await sb.auth.signOut();location.reload()}
+$('#logout').onclick=logout;$('#denyOut').onclick=logout;
+function show(v){$('#authView').hidden=v!=='auth';$('#denyView').hidden=v!=='deny';$('#appView').hidden=v!=='app'}
+
+async function boot(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){show('auth');setAuthMode('login');return}
+  if(S.recovery)return;
+  const [{data:staff},{data:admin}]=await Promise.all([sb.rpc('is_staff'),sb.rpc('is_admin')]);
+  if(!staff){show('deny');$('#denyTxt').textContent=`La cuenta ${session.user.email} no tiene permisos para gestionar el seguimiento. Si debería tenerlos, pide a un administrador que te dé acceso desde Ajustes.`;return}
+  S.user=session.user;S.isAdmin=!!admin;
+  $('#userEmail').textContent=session.user.email;
+  $('#tabSettings').hidden=!S.isAdmin;
+  show('app');
+  await Promise.all([loadStatuses(),loadSettings()]);
+  await loadVehicles();
+  subscribeAdmin();
+}
+
+/* ================= DATOS ================= */
+async function loadStatuses(){
+  const {data,error}=await sb.from('vehicle_statuses').select('*').order('sort');
+  if(error){toast(errMsg(error),'ko');return}
+  S.statuses=data;S.stMap=Object.fromEntries(data.map(s=>[s.key,s]));
+  $('#qStatus').innerHTML='<option value="">Todos los estados</option>'+data.map(s=>`<option value="${esc(s.key)}">${esc(s.label)}</option>`).join('');
+}
+async function loadSettings(){
+  const {data}=await sb.from('app_settings').select('*');
+  S.settings=Object.fromEntries((data||[]).map(r=>[r.key,r.value]));
+}
+let loadSeq=0;
+async function loadVehicles(){
+  const seq=++loadSeq;
+  let q=sb.from('vehicles').select('*').eq('archived',S.arch);
+  const p=NK.normPlate($('#qPlate').value);if(p)q=q.ilike('plate_norm','%'+p+'%');
+  const s=$('#qStatus').value;if(s)q=q.eq('status',s);
+  const sort=$('#qSort').value;q=q.order(sort,{ascending:false}).order('created_at',{ascending:false}).limit(500);
+  const {data,error}=await q;
+  if(seq!==loadSeq)return;
+  if(error){toast(errMsg(error),'ko');return}
+  S.vehicles=data;renderList();loadStats();
+}
+async function loadStats(){
+  const {data}=await sb.from('vehicles').select('status,archived');
+  const a=(data||[]).filter(v=>!v.archived);
+  const ready=a.filter(v=>v.status==='listo').length,inc=a.filter(v=>['incidencia','pausa'].includes(v.status)).length;
+  $('#stats').innerHTML=[[a.length,'Vehículos activos'],[a.filter(v=>!['listo','finalizado'].includes(v.status)).length,'En proceso'],[ready,'Listos para entregar'],[inc,'En pausa o incidencia']].map(([n,l])=>`<div class="card stat"><b>${n}</b><span>${l}</span></div>`).join('');
+}
+function renderList(){
+  const L=$('#list');
+  if(!S.vehicles.length){L.innerHTML=`<div class="card empty">${S.arch?'No hay vehículos archivados.':'Todavía no hay vehículos. Pulsa «Registrar vehículo» para añadir el primero.'}</div>`;return}
+  L.innerHTML=S.vehicles.map(v=>{const s=st(v.status);return `<button class="card row" data-id="${v.id}">
+    <span class="pl">${esc(v.plate.toUpperCase())}</span>
+    <span><span class="mm">${esc(v.make_model)}</span><br><span class="cl">${esc(v.client_ref||'—')}</span></span>
+    <span class="bd">${badge(v.status)}</span>
+    <div><div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted)"><span>Progreso</span><b style="color:var(--text)">${v.progress}%</b></div><div class="mini" style="--c:${esc(s.color)}"><i style="width:${v.progress}%"></i></div></div>
+    <span class="when">${$('#qSort').value==='entry_date'?'Entrada '+fShort(v.entry_date):fRel(v.updated_at)}</span>
+  </button>`}).join('');
+}
+let qT;$('#qPlate').addEventListener('input',()=>{clearTimeout(qT);qT=setTimeout(loadVehicles,250)});
+$('#qStatus').onchange=loadVehicles;$('#qSort').onchange=loadVehicles;
+$$('.seg button').forEach(b=>b.onclick=()=>{$$('.seg button').forEach(x=>x.classList.toggle('on',x===b));S.arch=b.dataset.arch==='1';loadVehicles()});
+$('#list').addEventListener('click',e=>{const r=e.target.closest('.row');if(r)openVehicle(r.dataset.id)});
+$$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.classList.toggle('on',x===b));$('#tab-vehicles').hidden=b.dataset.tab!=='vehicles';$('#tab-settings').hidden=b.dataset.tab!=='settings';if(b.dataset.tab==='settings')renderSettings()});
+
+/* ================= TIEMPO REAL (panel) ================= */
+let rtT;
+function subscribeAdmin(){
+  const live=$('#adminLive');
+  sb.channel('admin-vehicles').on('postgres_changes',{event:'*',schema:'public',table:'vehicles'},()=>{
+    clearTimeout(rtT);rtT=setTimeout(()=>{loadVehicles();if(S.openId&&!S.dirty)openVehicle(S.openId,true)},400);
+  }).subscribe(s=>{
+    if(s==='SUBSCRIBED'){live.className='live on';live.lastElementChild.textContent='En directo'}
+    else if(s==='CHANNEL_ERROR'||s==='TIMED_OUT'){live.className='live poll';live.lastElementChild.textContent='Actualización automática';setInterval(()=>{if(document.visibilityState==='visible')loadVehicles()},30000)}
+  });
+}
+
+/* ================= FOTOS ================= */
+async function compress(file){
+  if(!file||!/^image\/(jpeg|png|webp)$/.test(file.type))return file;
+  try{
+    const bmp=await createImageBitmap(file);const max=1800,k=Math.min(1,max/Math.max(bmp.width,bmp.height));
+    if(k===1&&file.size<1.5e6)return file;
+    const c=document.createElement('canvas');c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);
+    c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+    const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.85));
+    return blob?new File([blob],'foto.jpg',{type:'image/jpeg'}):file;
+  }catch(e){return file}
+}
+async function uploadPhoto(file,vehicleId){
+  if(!file)return null;
+  if(file.size>15*1024*1024)throw new Error('La foto supera los 15 MB.');
+  const f=await compress(file);
+  const ext=(f.type.split('/')[1]||'jpg').replace('jpeg','jpg');
+  const path=`${vehicleId||'nuevos'}/${(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36))}.${ext}`;
+  const {error}=await sb.storage.from(NK.PHOTO_BUCKET).upload(path,f,{contentType:f.type,upsert:false});
+  if(error)throw error;
+  return path;
+}
+
+/* ================= FICHA (drawer) ================= */
+const drawer=$('#drawer'),overlay=$('#overlay');
+function closeDrawer(){drawer.classList.remove('on');overlay.classList.remove('on');S.openId=null;S.dirty=false}
+overlay.onclick=closeDrawer;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('.modal'))$('.modal').remove();else closeDrawer()}});
+
+async function openVehicle(id,refresh){
+  S.openId=id;
+  if(!refresh){drawer.innerHTML='<div class="d-body"><div class="muted">Cargando…</div></div>';drawer.classList.add('on');overlay.classList.add('on')}
+  const [{data:v,error},{data:hist},{data:notifs}]=await Promise.all([
+    sb.from('vehicles').select('*').eq('id',id).single(),
+    sb.from('vehicle_updates').select('*').eq('vehicle_id',id).order('created_at',{ascending:false}).limit(200),
+    sb.from('notifications_log').select('*').eq('vehicle_id',id).order('created_at',{ascending:false}).limit(50)
+  ]);
+  if(error||!v){if(!refresh){toast('No se encontró el vehículo','ko');closeDrawer()}return}
+  S.cur=v;S.dirty=false;
+  const link=trackingLink(v.public_token);
+  drawer.innerHTML=`
+  <div class="d-head">
+    <div><span class="eyebrow">${esc(v.plate.toUpperCase())}</span><h2 style="margin-top:6px">${esc(v.make_model)}</h2><div style="margin-top:10px">${badge(v.status)}</div></div>
+    <button class="x" id="dClose" aria-label="Cerrar">✕</button>
+  </div>
+  <div class="d-body">
+    <div class="acts">
+      <button class="btn btn-ghost btn-sm" id="dEdit">Editar datos</button>
+      <button class="btn btn-ghost btn-sm" id="dCopy">Copiar enlace cliente</button>
+      <a class="btn btn-ghost btn-sm" href="${esc(link)}" target="_blank" rel="noopener">Ver como cliente ↗</a>
+      <button class="btn btn-ghost btn-sm" id="dArch">${v.archived?'Reactivar':'Archivar'}</button>
+      <button class="btn btn-danger btn-sm" id="dDel">Eliminar</button>
+    </div>
+
+    <form class="card pad" id="upForm" novalidate>
+      <div class="sec-t">Actualizar seguimiento</div>
+      <div class="field"><label>Progreso</label>
+        <div class="slider-row"><input type="range" min="0" max="100" step="1" id="uRange" value="${v.progress}" aria-label="Progreso"><input class="input num" type="number" min="0" max="100" id="uNum" value="${v.progress}" aria-label="Porcentaje"><span class="pv" id="uPv">${v.progress}%</span></div>
+      </div>
+      <div class="grid2" style="margin-top:14px">
+        <div class="field"><label for="uStatus">Estado</label><select id="uStatus">${S.statuses.filter(s=>s.active||s.key===v.status).map(s=>`<option value="${esc(s.key)}" ${s.key===v.status?'selected':''}>${esc(s.label)}</option>`).join('')}</select><small id="uStDesc">${esc(st(v.status).description||'')}</small></div>
+        <div class="field"><label for="uEta">Fecha estimada de finalización</label><input type="date" id="uEta" value="${v.eta||''}"></div>
+        <div class="field full"><label for="uNote">Descripción de esta actualización <span class="muted">(la ve el cliente en el historial)</span></label><textarea id="uNote" placeholder="Ej. Hemos sustituido las pastillas y estamos revisando los discos."></textarea></div>
+        <div class="field full"><label for="uPub">Observaciones visibles para el cliente</label><textarea id="uPub">${esc(v.public_notes||'')}</textarea></div>
+        <div class="field full"><label for="uPriv">Nota privada <span class="muted">(solo administración)</span></label><textarea id="uPriv" placeholder="No la verá el cliente"></textarea></div>
+        <div class="field full"><label for="uPhoto">Añadir fotografía <span class="muted">(opcional, se mostrará en el historial)</span></label><input type="file" id="uPhoto" accept="image/*"></div>
+      </div>
+      <div id="upMsg" style="margin-top:12px"></div>
+      <div class="acts" style="margin-top:14px;justify-content:flex-end"><button class="btn btn-primary" type="submit" id="uSave">Actualizar seguimiento</button></div>
+    </form>
+
+    <div id="notifySlot"></div>
+
+    <div class="card pad">
+      <div class="sec-t">Datos del vehículo</div>
+      ${v.photo_path?`<img class="thumb" src="${esc(photoUrl(v.photo_path))}" alt="Foto del vehículo" style="margin-bottom:16px">`:''}
+      <div class="kv">
+        <span>Código de seguimiento</span><b class="code">${esc(v.tracking_code)}</b>
+        <span>Cliente</span><b>${esc(v.client_ref||'—')}</b>
+        <span>Teléfono</span><b>${esc(v.client_phone||'—')}</b>
+        <span>Email</span><b>${esc(v.client_email||'—')}</b>
+        <span>Fecha de entrada</span><b>${fDate(v.entry_date)}</b>
+        <span>Registrado</span><b>${fDateTime(v.created_at)}</b>
+        <span>Última actualización</span><b>${fDateTime(v.updated_at)}</b>
+        <span>Trabajo / proceso</span><b style="font-weight:400;white-space:pre-line">${esc(v.description||'—')}</b>
+        <span>Avisos al cliente</span><b>${v.notify?'Activados':'Desactivados'}</b>
+      </div>
+      <div class="acts" style="margin-top:16px">
+        <button class="btn btn-wa btn-sm" data-send="whatsapp" ${v.client_phone?'':'disabled title="Añade un teléfono al cliente"'}>Enviar seguimiento por WhatsApp</button>
+        <button class="btn btn-ghost btn-sm" data-send="email" ${v.client_email?'':'disabled title="Añade un email al cliente"'}>Enviar por email</button>
+      </div>
+    </div>
+
+    ${v.private_notes?`<div class="card pad"><div class="sec-t">Notas privadas</div><div class="privbox">${esc(v.private_notes)}</div></div>`:''}
+
+    <div class="card pad">
+      <div class="sec-t">Historial de modificaciones <span class="muted" style="font-family:var(--sans);font-size:.8rem;text-transform:none">${(hist||[]).length}</span></div>
+      ${(hist||[]).map(h=>{
+        const ch=h.changes?Object.keys(h.changes).filter(k=>!['status','progress','private_notes','public_notes'].includes(k)).map(k=>FIELD[k]||k):[];
+        const stCh=h.old_status&&h.old_status!==h.new_status?`${esc(st(h.old_status).label)} → ${esc(st(h.new_status).label)}`:esc(st(h.new_status).label);
+        const pCh=h.old_progress!=null&&h.old_progress!==h.new_progress?`${h.old_progress}% → ${h.new_progress}%`:(h.new_progress!=null?h.new_progress+'%':'');
+        return `<div class="h-item">
+          <div class="h-top"><b>${esc(KIND[h.kind]||h.kind)} · ${stCh} ${pCh?'· '+pCh:''}</b><span class="tag ${h.visible_to_client?'vis':''}">${h.visible_to_client?'Visible cliente':'Interno'}</span></div>
+          <div class="h-meta">${fDateTime(h.created_at)} · ${esc(h.user_email||'sistema')}</div>
+          ${h.note?`<p>${esc(h.note)}</p>`:''}
+          ${h.changes&&h.changes.public_notes?`<p>Observaciones: ${esc(h.changes.public_notes.new||'(vacío)')}</p>`:''}
+          ${h.private_note?`<p class="priv">🔒 ${esc(h.private_note)}</p>`:''}
+          ${ch.length?`<p class="muted">Campos modificados: ${esc(ch.join(', '))}</p>`:''}
+          ${h.photo_path?`<img src="${esc(photoUrl(h.photo_path))}" alt="">`:''}
+        </div>`}).join('')||'<p class="muted">Sin cambios registrados.</p>'}
+    </div>
+
+    <div class="card pad">
+      <div class="sec-t">Avisos enviados</div>
+      ${(notifs||[]).map(n=>`<div class="h-item"><div class="h-top"><b>${n.channel==='whatsapp'?'WhatsApp':'Email'} · ${esc(n.recipient||'')}</b><span class="h-meta">${fDateTime(n.created_at)}</span></div>${n.message?`<p class="muted">${esc(n.message.slice(0,160))}${n.message.length>160?'…':''}</p>`:''}</div>`).join('')||'<p class="muted">Todavía no se ha enviado ningún aviso.</p>'}
+    </div>
+  </div>`;
+  bindDrawer(v,link);
+}
+
+function bindDrawer(v,link){
+  $('#dClose').onclick=closeDrawer;
+  const r=$('#uRange'),n=$('#uNum'),pv=$('#uPv');
+  const setP=x=>{x=Math.max(0,Math.min(100,parseInt(x,10)||0));r.value=x;n.value=x;pv.textContent=x+'%';S.dirty=true};
+  r.oninput=()=>setP(r.value);n.oninput=()=>setP(n.value);
+  $('#uStatus').onchange=e=>{const s=st(e.target.value);$('#uStDesc').textContent=s.description||'';if(s.default_progress!=null)setP(s.default_progress);S.dirty=true};
+  ['#uEta','#uNote','#uPub','#uPriv','#uPhoto'].forEach(q=>$(q).addEventListener('input',()=>S.dirty=true));
+  $('#dCopy').onclick=async()=>{try{await navigator.clipboard.writeText(link);toast('Enlace copiado','ok')}catch(e){prompt('Copia el enlace:',link)}};
+  $('#dEdit').onclick=()=>openForm(v);
+  $('#dArch').onclick=async e=>{busy(e.target,true);const {error}=await sb.from('vehicles').update({archived:!v.archived}).eq('id',v.id);busy(e.target,false);if(error)return toast(errMsg(error),'ko');toast(v.archived?'Vehículo reactivado':'Vehículo archivado','ok');closeDrawer();loadVehicles()};
+  $('#dDel').onclick=()=>confirmDelete(v);
+  $$('[data-send]').forEach(b=>b.onclick=()=>sendToClient(v,b.dataset.send));
+  $('#upForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const btn=$('#uSave'),box=$('#upMsg');busy(btn,true);msg(box,'','');
+    try{
+      const file=$('#uPhoto').files[0];
+      const photo=file?await uploadPhoto(file,v.id):null;
+      const newStatus=$('#uStatus').value,newP=parseInt($('#uNum').value,10)||0;
+      const {error}=await sb.rpc('admin_update_vehicle',{p_id:v.id,p_progress:newP,p_status:newStatus,p_public_notes:$('#uPub').value,p_eta:$('#uEta').value||null,p_note:$('#uNote').value.trim()||null,p_private_note:$('#uPriv').value.trim()||null,p_photo_path:photo});
+      if(error)throw error;
+      toast('Seguimiento actualizado. El cliente ya lo ve.','ok');
+      S.dirty=false;
+      const statusChanged=newStatus!==v.status;
+      await openVehicle(v.id,true);
+      loadVehicles();
+      const N=S.settings.notifications||{};
+      if(N.enabled&&v.notify&&(v.client_phone||v.client_email)&&((statusChanged&&N.on_status_change)||(newStatus==='listo'&&N.on_ready))){
+        const s=st(newStatus);
+        $('#notifySlot').innerHTML=`<div class="card pad notify"><div class="sec-t">¿Avisar al cliente?</div><p class="muted" style="font-size:.9rem;margin-bottom:14px">El estado ha cambiado a <b style="color:var(--text)">${esc(s.label)}</b>. Envíale el aviso con el enlace de seguimiento.</p><div class="acts">${v.client_phone?'<button class="btn btn-wa btn-sm" data-n="whatsapp">Avisar por WhatsApp</button>':''}${v.client_email?'<button class="btn btn-ghost btn-sm" data-n="email">Avisar por email</button>':''}<button class="btn btn-ghost btn-sm" data-n="no">Ahora no</button></div></div>`;
+        $$('[data-n]').forEach(b=>b.onclick=()=>{if(b.dataset.n==='no'){$('#notifySlot').innerHTML='';return}sendToClient(S.cur,b.dataset.n,true)});
+        $('#notifySlot').scrollIntoView({behavior:'smooth',block:'center'});
+      }
+    }catch(err){msg(box,'ko',errMsg(err))}
+    finally{busy(btn,false)}
+  });
+}
+
+async function sendToClient(v,channel,isStatus){
+  const s=st(v.status),link=trackingLink(v.public_token);
+  const text=(isStatus?`Hola${v.client_ref?' '+v.client_ref:''}, te escribimos de NK Automoción. Tu vehículo ${v.make_model} (${v.plate.toUpperCase()}) ha cambiado de estado: ${s.label} (${v.progress}%).`:`Hola${v.client_ref?' '+v.client_ref:''}, te escribimos de NK Automoción. Puedes seguir el estado de tu vehículo ${v.make_model} (${v.plate.toUpperCase()}) en tiempo real aquí:`)+`\n\n${link}\n\nMatrícula: ${v.plate.toUpperCase()}\nCódigo de seguimiento: ${v.tracking_code}`;
+  let recipient,url;
+  if(channel==='whatsapp'){recipient=v.client_phone;url=`https://wa.me/${waPhone(v.client_phone)}?text=${encodeURIComponent(text)}`}
+  else{recipient=v.client_email;url=`mailto:${encodeURIComponent(v.client_email)}?subject=${encodeURIComponent('Seguimiento de tu vehículo '+v.plate.toUpperCase()+' · NK Automoción')}&body=${encodeURIComponent(text)}`}
+  window.open(url,'_blank','noopener');
+  const {error}=await sb.from('notifications_log').insert({vehicle_id:v.id,channel,recipient,message:text});
+  if(error)toast('El aviso se abrió, pero no se pudo registrar: '+errMsg(error),'ko');else{toast('Aviso registrado','ok');if(S.openId===v.id)openVehicle(v.id,true)}
+}
+
+function confirmDelete(v){
+  const m=document.createElement('div');m.className='modal confirm';
+  m.innerHTML=`<div class="box"><h3>Eliminar vehículo</h3><p>Se borrará definitivamente <b>${esc(v.plate.toUpperCase())}</b> con todo su historial. Esta acción no se puede deshacer. Si solo quieres sacarlo de la lista, usa «Archivar».</p><div class="field"><label for="cfPlate">Escribe la matrícula para confirmar</label><input id="cfPlate" class="plate-input" autocomplete="off"></div><div class="acts" style="margin-top:16px;justify-content:flex-end"><button class="btn btn-ghost btn-sm" id="cfNo">Cancelar</button><button class="btn btn-danger btn-sm" id="cfYes" disabled>Eliminar definitivamente</button></div></div>`;
+  document.body.appendChild(m);
+  const inp=m.querySelector('#cfPlate'),yes=m.querySelector('#cfYes');
+  inp.oninput=()=>yes.disabled=NK.normPlate(inp.value)!==v.plate_norm;inp.focus();
+  m.querySelector('#cfNo').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
+  yes.onclick=async()=>{busy(yes,true);const {error}=await sb.from('vehicles').delete().eq('id',v.id);busy(yes,false);if(error)return toast(errMsg(error),'ko');m.remove();closeDrawer();toast('Vehículo eliminado','ok');loadVehicles()};
+}
+
+/* ================= ALTA / EDICIÓN ================= */
+$('#newBtn').onclick=()=>openForm(null);
+function openForm(v){
+  const isNew=!v;v=v||{entry_date:new Date().toLocaleDateString('en-CA',{timeZone:'Atlantic/Canary'}),progress:0,status:'registrado',notify:true};
+  const m=document.createElement('div');m.className='modal';
+  m.innerHTML=`<div class="box" role="dialog" aria-modal="true"><header><h2>${isNew?'Registrar vehículo':'Editar vehículo'}</h2><button class="x" data-close aria-label="Cerrar">✕</button></header>
+  <form id="vForm" novalidate>
+    <div class="field"><label for="vPlate">Matrícula *</label><input id="vPlate" class="plate-input" value="${esc(v.plate||'')}" autocomplete="off" placeholder="1234 ABC"></div>
+    <div class="field"><label for="vMM">Marca y modelo *</label><input id="vMM" value="${esc(v.make_model||'')}" placeholder="Ej. Seat León 1.5 TSI"></div>
+    <div class="field"><label for="vClient">Cliente (nombre o referencia interna)</label><input id="vClient" value="${esc(v.client_ref||'')}"></div>
+    <div class="field"><label for="vEntry">Fecha de entrada *</label><input type="date" id="vEntry" value="${esc(v.entry_date||'')}"></div>
+    <div class="field"><label for="vPhone">Teléfono del cliente</label><input id="vPhone" type="tel" value="${esc(v.client_phone||'')}" placeholder="600 000 000"></div>
+    <div class="field"><label for="vEmail">Email del cliente</label><input id="vEmail" type="email" value="${esc(v.client_email||'')}"></div>
+    <div class="field full"><label for="vDesc">Descripción del trabajo o proceso <span class="muted">(interna)</span></label><textarea id="vDesc">${esc(v.description||'')}</textarea></div>
+    ${isNew?`<div class="field"><label for="vStatus">Estado inicial</label><select id="vStatus">${S.statuses.filter(s=>s.active).map(s=>`<option value="${esc(s.key)}" ${s.key===v.status?'selected':''}>${esc(s.label)}</option>`).join('')}</select></div>
+    <div class="field"><label for="vProg">Porcentaje inicial</label><input type="number" min="0" max="100" id="vProg" value="${v.progress}"></div>`:''}
+    <div class="field"><label for="vEta">Fecha estimada de finalización</label><input type="date" id="vEta" value="${esc(v.eta||'')}"></div>
+    <div class="field"><label for="vCode">Código privado de seguimiento</label><input id="vCode" class="plate-input" value="${esc(v.tracking_code||'')}" placeholder="${isNew?'Se genera automáticamente':''}" maxlength="20"><small>${isNew?'Déjalo vacío para generar uno seguro.':'Si lo cambias, el código anterior dejará de funcionar.'}</small></div>
+    <div class="field full"><label for="vPhoto">Fotografía del vehículo</label><input type="file" id="vPhoto" accept="image/*">${v.photo_path?'<small>Ya tiene foto. Sube otra para sustituirla.</small>':''}</div>
+    <label class="check full"><input type="checkbox" id="vNotify" ${v.notify?'checked':''}> Permitir avisos a este cliente</label>
+    <div class="full" id="vMsg"></div>
+    <footer><button type="button" class="btn btn-ghost" data-close>Cancelar</button><button class="btn btn-primary" type="submit" id="vSave">${isNew?'Registrar vehículo':'Guardar cambios'}</button></footer>
+  </form></div>`;
+  document.body.appendChild(m);
+  m.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>m.remove());
+  m.addEventListener('mousedown',e=>{if(e.target===m)m.remove()});
+  const sSel=m.querySelector('#vStatus');if(sSel)sSel.onchange=()=>{const s=st(sSel.value);if(s.default_progress!=null)m.querySelector('#vProg').value=s.default_progress};
+  m.querySelector('#vPlate').focus();
+  m.querySelector('#vForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const g=id=>m.querySelector(id),box=g('#vMsg'),btn=g('#vSave');
+    ['#vPlate','#vMM','#vEntry'].forEach(id=>g(id).parentElement.classList.remove('err'));
+    const bad=[];if(NK.normPlate(g('#vPlate').value).length<4)bad.push('#vPlate');if(!g('#vMM').value.trim())bad.push('#vMM');if(!g('#vEntry').value)bad.push('#vEntry');
+    const em=g('#vEmail').value.trim();if(em&&!/^\S+@\S+\.\S+$/.test(em)){bad.push('#vEmail')}
+    if(bad.length){bad.forEach(id=>g(id).parentElement.classList.add('err'));return msg(box,'ko','Revisa los campos marcados.')}
+    busy(btn,true);msg(box,'','');
+    try{
+      const rec={plate:g('#vPlate').value.trim().toUpperCase().replace(/\s+/g,' '),make_model:g('#vMM').value.trim(),client_ref:g('#vClient').value.trim()||null,entry_date:g('#vEntry').value,client_phone:g('#vPhone').value.trim()||null,client_email:em||null,description:g('#vDesc').value.trim()||null,eta:g('#vEta').value||null,tracking_code:g('#vCode').value.trim()||(isNew?'':v.tracking_code),notify:g('#vNotify').checked};
+      const file=g('#vPhoto').files[0];
+      if(isNew){
+        rec.status=g('#vStatus').value;rec.progress=Math.max(0,Math.min(100,parseInt(g('#vProg').value,10)||0));
+        if(file)rec.photo_path=await uploadPhoto(file,null);
+        const {data,error}=await sb.from('vehicles').insert(rec).select().single();
+        if(error)throw error;
+        m.remove();loadVehicles();
+        showCreated(data);
+      }else{
+        if(file)rec.photo_path=await uploadPhoto(file,v.id);
+        const {error}=await sb.from('vehicles').update(rec).eq('id',v.id);
+        if(error)throw error;
+        m.remove();toast('Datos guardados','ok');openVehicle(v.id,true);loadVehicles();
+      }
+    }catch(err){msg(box,'ko',errMsg(err))}
+    finally{busy(btn,false)}
+  });
+}
+function showCreated(v){
+  const link=trackingLink(v.public_token);
+  const m=document.createElement('div');m.className='modal confirm';
+  m.innerHTML=`<div class="box"><span class="eyebrow">Registrado</span><h3 style="margin-top:10px">${esc(v.plate.toUpperCase())} · ${esc(v.make_model)}</h3><p>Entrega al cliente estos datos para que pueda consultar su vehículo:</p>
+  <div class="kv" style="margin-bottom:16px"><span>Código de seguimiento</span><b class="code">${esc(v.tracking_code)}</b><span>Enlace directo</span><b style="word-break:break-all;font-weight:400;font-size:.82rem">${esc(link)}</b></div>
+  <div class="acts">${v.client_phone?'<button class="btn btn-wa btn-sm" data-c="whatsapp">Enviar por WhatsApp</button>':''}${v.client_email?'<button class="btn btn-ghost btn-sm" data-c="email">Enviar por email</button>':''}<button class="btn btn-ghost btn-sm" data-c="copy">Copiar enlace</button><button class="btn btn-primary btn-sm" data-c="open">Abrir ficha</button></div></div>`;
+  document.body.appendChild(m);m.onclick=e=>{if(e.target===m)m.remove()};
+  m.querySelectorAll('[data-c]').forEach(b=>b.onclick=async()=>{const c=b.dataset.c;
+    if(c==='copy'){try{await navigator.clipboard.writeText(link);toast('Enlace copiado','ok')}catch(e){prompt('Copia el enlace:',link)}}
+    else if(c==='open'){m.remove();openVehicle(v.id)}
+    else sendToClient(v,c,false)});
+}
+
+/* ================= AJUSTES ================= */
+function renderSettings(){
+  if(!S.isAdmin)return;
+  $('#stBody').innerHTML=S.statuses.map(s=>`<tr data-key="${esc(s.key)}"><td><input type="number" data-f="sort" value="${s.sort}"></td><td><input data-f="label" value="${esc(s.label)}"></td><td class="wide"><textarea data-f="description">${esc(s.description||'')}</textarea></td><td><input type="color" data-f="color" value="${esc(s.color)}"></td><td><input type="number" min="0" max="100" data-f="default_progress" value="${s.default_progress??''}" placeholder="—"></td><td><input type="checkbox" data-f="active" ${s.active?'checked':''} style="width:20px;height:20px;accent-color:var(--accent)"></td></tr>`).join('');
+  const N=S.settings.notifications||{};$('#nEnabled').checked=!!N.enabled;$('#nStatus').checked=!!N.on_status_change;$('#nReady').checked=!!N.on_ready;
+  $('#brandColor').value=(S.settings.brand&&S.settings.brand.accent)||'#f2c637';
+  $('#adminEmails').value=(S.settings.admin_emails||[]).join('\n');
+  loadUsers();
+}
+async function loadUsers(){
+  const {data}=await sb.from('profiles').select('*').order('created_at');
+  $('#usersList').innerHTML='<div class="lbl" style="margin-bottom:8px">Cuentas creadas</div>'+(data||[]).map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:.86rem"><span style="overflow:hidden;text-overflow:ellipsis">${esc(p.email)}</span><select class="input" data-uid="${p.id}" style="width:150px;padding:8px" ${p.id===S.user.id?'disabled':''}><option value="admin" ${p.role==='admin'?'selected':''}>Administrador</option><option value="staff" ${p.role==='staff'?'selected':''}>Empleado</option><option value="none" ${p.role==='none'?'selected':''}>Sin acceso</option></select></div>`).join('');
+  $$('[data-uid]').forEach(sel=>sel.onchange=async()=>{const {error}=await sb.from('profiles').update({role:sel.value}).eq('id',sel.dataset.uid);toast(error?errMsg(error):'Permisos actualizados',error?'ko':'ok')});
+}
+$('#addStatus').onclick=()=>{
+  const label=prompt('Nombre del nuevo estado (ej. "Esperando piezas")');if(!label)return;
+  const key=label.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,40)||('estado_'+Date.now());
+  sb.from('vehicle_statuses').insert({key,label,description:'',color:'#f2c637',icon:'dot',sort:(S.statuses.at(-1)?.sort||0)+1,default_progress:null}).then(async({error})=>{if(error)return toast(errMsg(error),'ko');await loadStatuses();renderSettings();toast('Estado añadido','ok')});
+};
+$('#saveStatuses').onclick=async e=>{
+  busy(e.target,true);
+  const rows=$$('#stBody tr').map(tr=>{const o={key:tr.dataset.key};tr.querySelectorAll('[data-f]').forEach(i=>{const f=i.dataset.f;o[f]=i.type==='checkbox'?i.checked:(f==='sort'?parseInt(i.value,10)||0:f==='default_progress'?(i.value===''?null:Math.max(0,Math.min(100,parseInt(i.value,10)))):i.value)});return o});
+  let err=null;for(const r of rows){const {key,...rest}=r;const {error}=await sb.from('vehicle_statuses').update(rest).eq('key',key);if(error){err=error;break}}
+  busy(e.target,false);if(err)return toast(errMsg(err),'ko');await loadStatuses();renderSettings();renderList();toast('Estados guardados','ok');
+};
+$('#saveSettings').onclick=async e=>{
+  busy(e.target,true);
+  const emails=$('#adminEmails').value.split(/[\s,;]+/).map(x=>x.trim().toLowerCase()).filter(x=>/^\S+@\S+\.\S+$/.test(x));
+  const ups=[['notifications',{enabled:$('#nEnabled').checked,on_status_change:$('#nStatus').checked,on_ready:$('#nReady').checked}],['brand',{...(S.settings.brand||{}),accent:$('#brandColor').value}],['admin_emails',emails]];
+  let err=null;for(const [key,value] of ups){const {error}=await sb.from('app_settings').update({value,updated_at:new Date().toISOString()}).eq('key',key);if(error){err=error;break}}
+  busy(e.target,false);if(err)return toast(errMsg(err),'ko');await loadSettings();toast('Ajustes guardados','ok');
+};
+
+boot();
+})();
+</script>
+</body>
+</html>

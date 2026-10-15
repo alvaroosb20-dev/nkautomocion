@@ -107,7 +107,7 @@ header.hide{transform:translateY(-100%)}
 .menu{display:flex;gap:6px;font-size:.9rem;font-weight:500;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:999px;padding:5px;backdrop-filter:blur(10px)}
 .menu a{color:var(--soft);padding:8px 13px;border-radius:999px;transition:color .25s,background .25s;white-space:nowrap;font-size:.86rem}
 .nav-phone{white-space:nowrap}
-@media (max-width:1380px){.nav-phone{display:none!important}}
+@media (max-width:1500px){.nav-phone{display:none!important}}
 .menu a:hover{color:#fff}
 .menu a.active{color:var(--ink);background:var(--accent)}
 .nav-actions{display:flex;align-items:center;gap:14px}
@@ -178,6 +178,27 @@ header.hide{transform:translateY(-100%)}
 
 section{padding:150px 0;position:relative}
 
+
+
+/* ===== SEGUIMIENTO (buscador) ===== */
+.track{background:var(--bg);padding:110px 0 30px}
+.track-box{position:relative;overflow:hidden;isolation:isolate;border:1px solid var(--line-2);border-radius:28px;background:linear-gradient(135deg,var(--card-2),var(--card));padding:54px;display:grid;grid-template-columns:1fr 1.1fr;gap:48px;align-items:center}
+.track-box::before{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(242,198,55,.18),transparent 65%);z-index:-1}
+.track-box h2{font-size:clamp(2.4rem,4.6vw,4rem)}
+.track-box .lead{color:var(--soft);margin-top:18px;font-size:1.02rem}
+.track-form{display:flex;flex-direction:column;gap:12px}
+.track-form .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.track-form input{width:100%;background:var(--bg);border:1px solid var(--line-2);color:var(--text);padding:16px;border-radius:12px;font-family:var(--mono);font-size:1.05rem;letter-spacing:.12em;text-transform:uppercase;outline:none;transition:border-color .2s,box-shadow .2s}
+.track-form input::placeholder{letter-spacing:.04em;text-transform:none;font-family:var(--sans);color:#5a616c}
+.track-form input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(242,198,55,.12)}
+.track-form label{font-size:.8rem;color:var(--soft);font-weight:500;display:block;margin-bottom:7px}
+.track-form .err input{border-color:#ff6b6b}
+.track-note{font-size:.82rem;color:var(--muted)}
+.track-steps{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px}
+.track-steps span{display:inline-flex;align-items:center;gap:8px;font-size:.84rem;color:var(--soft)}
+.track-steps svg{color:var(--accent)}
+@media (max-width:900px){.track-box{grid-template-columns:1fr;padding:30px 22px;gap:28px}.track{padding:80px 0 10px}}
+@media (max-width:480px){.track-form .row2{grid-template-columns:1fr}}
 
 /* ===== SECTORES ===== */
 .sectors{background:var(--bg);padding:130px 0 110px}
@@ -481,9 +502,8 @@ footer ul a:hover{color:var(--accent)}
   <div class="wrap nav">
     <a href="#inicio" class="logo" aria-label="NK Automoción, inicio"><span class="nk-box">NK</span><span class="nk-word">AUTOMOCIÓN</span></a>
     <nav class="menu" aria-label="Principal">
-      <a href="#sectores">Sectores</a>
+      <a href="#seguimiento">Seguimiento</a>
       <a href="#servicios">Qué ofrecemos</a>
-      <a href="#por-que">Por qué nosotros</a>
       <a href="#como-trabajamos">Cómo trabajamos</a>
       <a href="#nosotros">Quiénes somos</a>
       <a href="#contacto">Contacto</a>
@@ -499,6 +519,7 @@ footer ul a:hover{color:var(--accent)}
 </header>
 
 <nav class="mnav" id="mnav" aria-label="Menú móvil">
+  <a class="ml" href="seguimiento.html">Seguimiento <span>★</span></a>
   <a class="ml" href="#sectores">Sectores <span>00</span></a>
   <a class="ml" href="#servicios">Qué ofrecemos <span>01</span></a>
   <a class="ml" href="#por-que">Por qué nosotros <span>02</span></a>
@@ -557,6 +578,31 @@ footer ul a:hover{color:var(--accent)}
   </div>
 </div>
 
+
+<!-- ===== SEGUIMIENTO ===== -->
+<section class="track" id="seguimiento">
+  <div class="wrap">
+    <div class="track-box reveal">
+      <div>
+        <span class="eyebrow">Seguimiento en tiempo real</span>
+        <h2>Consulta el estado <span class="y">de tu vehículo</span></h2>
+        <p class="lead">Introduce la matrícula de tu vehículo para consultar su estado actual y ver cómo avanza el proceso.</p>
+        <div class="track-steps">
+          <span><svg width="16" height="16"><use href="#i-check"/></svg>Estado actualizado al momento</span>
+          <span><svg width="16" height="16"><use href="#i-check"/></svg>Historial de cada paso</span>
+        </div>
+      </div>
+      <form class="track-form" id="trackForm" novalidate>
+        <div class="row2">
+          <div><label for="tPlate">Matrícula</label><input id="tPlate" autocomplete="off" autocapitalize="characters" placeholder="1234 ABC" maxlength="14"></div>
+          <div><label for="tCode">Código de seguimiento</label><input id="tCode" autocomplete="off" autocapitalize="characters" placeholder="Te lo damos al dejar el vehículo" maxlength="20"></div>
+        </div>
+        <button class="btn btn-primary btn-lg" type="submit">Consultar vehículo <svg class="arr" width="18" height="18"><use href="#i-arrow"/></svg></button>
+        <p class="track-note">Por seguridad, necesitas la matrícula y el código de seguimiento que te entregamos. ¿No lo tienes? Llámanos al <a href="tel:+34922293649" style="color:var(--accent)">922 29 36 49</a>.</p>
+      </form>
+    </div>
+  </div>
+</section>
 
 <!-- ===== TRABAJAMOS CON ===== -->
 <section class="sectors" id="sectores">
@@ -760,7 +806,7 @@ footer ul a:hover{color:var(--accent)}
         <p class="foot-about">Repuestos, accesorios y herramientas de automoción con calidad profesional en Santa Cruz de Tenerife.</p>
         <a class="partner" id="empresas" href="https://azimut.es/blugy/" target="_blank" rel="noopener"><span class="pl">B</span><span><small>Otras empresas</small>Blugy</span><svg width="14" height="14" style="color:var(--muted)"><use href="#i-ext"/></svg></a>
       </div>
-      <div><h4>Navegación</h4><ul><li><a href="#servicios">Qué ofrecemos</a></li><li><a href="#por-que">Por qué nosotros</a></li><li><a href="#como-trabajamos">Cómo trabajamos</a></li><li><a href="#nosotros">Quiénes somos</a></li><li><a href="trabaja-con-nosotros.html" style="color:var(--accent)">Trabaja con nosotros</a></li></ul></div>
+      <div><h4>Navegación</h4><ul><li><a href="#servicios">Qué ofrecemos</a></li><li><a href="#por-que">Por qué nosotros</a></li><li><a href="#como-trabajamos">Cómo trabajamos</a></li><li><a href="#nosotros">Quiénes somos</a></li><li><a href="trabaja-con-nosotros.html" style="color:var(--accent)">Trabaja con nosotros</a></li><li><a href="seguimiento.html">Seguimiento de vehículos</a></li><li><a href="admin.html" style="color:var(--muted)">Acceso empleados</a></li></ul></div>
       <div><h4>Contacto</h4><ul><li><a href="tel:+34922293649">922 29 36 49</a></li><li><a href="mailto:nkautomocion@gmail.com">nkautomocion@gmail.com</a></li><li>C. Laura Grote de la Puerta, 14<br>Nave 7 · 38110 S/C de Tenerife</li></ul></div>
       <div><h4>Legal</h4><ul><li><a href="https://www.shop.org.es/aviso-legal/">Aviso legal</a></li><li><a href="https://www.shop.org.es/politica-de-privacidad/">Política de privacidad</a></li><li><a href="#" id="cookieSettings">Configurar cookies</a></li></ul></div>
     </div>
@@ -1049,7 +1095,7 @@ layout();
 /* ========== BUCLE PRINCIPAL ========== */
 const header=$('#header'),mq=$('#mqSkew'),rpmEl=$('#rpm'),tl=$('#tl'),tlFill=$('#tlFill'),steps=$$('.step'),callbar=$('#callbar');
 const navLinks=$$('.menu a');
-const secs=['sectores','servicios','por-que','como-trabajamos','nosotros','contacto'].map(id=>document.getElementById(id));
+const secs=['seguimiento','servicios','como-trabajamos','nosotros','contacto'].map(id=>document.getElementById(id));
 let lastY=scrollY,vel=0,rpm=.8,lastT=performance.now(),lastWordP=-1,lastDir=0;
 function frame(t){
   const dt=Math.min((t-lastT)/1000,.05);lastT=t;
@@ -1165,6 +1211,16 @@ form.addEventListener('submit',e=>{
   const txt='*Solicitud de presupuesto – NK Automoción*\n\n'+Object.entries(fields).map(([k,v])=>`*${k}:* ${v}`).join('\n');
   msg.className='form-msg ok';msg.textContent='Abriendo WhatsApp… solo tienes que pulsar Enviar.';
   location.href='https://wa.me/'+WA_NUMBER+'?text='+encodeURIComponent(txt);
+});
+
+/* ========== BUSCADOR DE SEGUIMIENTO ========== */
+$('#trackForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const p=$('#tPlate'),c=$('#tCode'),n=v=>v.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  [p,c].forEach(x=>x.parentElement.classList.remove('err'));
+  const bad=[];if(n(p.value).length<4)bad.push(p);if(n(c.value).length<4)bad.push(c);
+  if(bad.length){bad.forEach(x=>x.parentElement.classList.add('err'));bad[0].focus();return}
+  location.href='seguimiento.html#m='+encodeURIComponent(n(p.value))+'&c='+encodeURIComponent(n(c.value));
 });
 
 /* ========== COOKIES ========== */

@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Seguimiento de tu vehículo · NK Automoción</title>
+<meta name="description" content="Consulta en tiempo real el estado y el progreso de tu vehículo en NK Automoción.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#08090b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23f2c637'/%3E%3Ctext x='31' y='43' font-family='Arial Black,Arial' font-weight='900' font-style='italic' font-size='30' text-anchor='middle' fill='%230b0b0b'%3ENK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Montserrat:ital,wght@0,800;1,900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="nk-app.css">
+<style>
+.hero{padding:70px 0 40px;position:relative;isolation:isolate;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(600px 400px at 85% 0%,rgba(242,198,55,.13),transparent 70%)}
+.hero h1{font-size:clamp(2.8rem,6.5vw,5.2rem);margin:18px 0 16px}
+.hero p{color:var(--soft);max-width:560px;font-size:1.05rem}
+.lookup{margin-top:34px;display:grid;grid-template-columns:1.2fr 1fr auto;gap:12px;align-items:end;max-width:860px}
+.lookup .btn{height:52px}
+.lookup-note{margin-top:12px;font-size:.84rem;color:var(--muted);max-width:640px}
+#lookupMsg{margin-top:18px;max-width:860px}
+
+.result{padding:10px 0 80px}
+.r-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:22px}
+.plate{display:inline-flex;align-items:stretch;border:2px solid #d7dbe1;border-radius:8px;overflow:hidden;background:#f4f5f7;color:#111;font-family:var(--mono);font-weight:500;font-size:1.5rem;letter-spacing:.08em}
+.plate b{background:#1f4fbf;color:#fff;font-size:.6rem;display:flex;flex-direction:column;justify-content:flex-end;padding:4px 6px;letter-spacing:0;font-family:var(--sans)}
+.plate span{padding:6px 16px}
+.r-title{font-size:clamp(2rem,4.4vw,3.2rem);margin-top:14px}
+.r-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:16px}
+.status-card{padding:30px;position:relative;overflow:hidden}
+.status-card::after{content:"";position:absolute;right:-80px;top:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--c,var(--accent)) 22%,transparent),transparent 70%);pointer-events:none}
+.st-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.st-desc{color:var(--soft);margin-top:14px;max-width:520px}
+.st-prog{margin-top:30px}
+.st-prog-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px;gap:12px}
+.facts{padding:6px 24px}
+.fact{display:flex;justify-content:space-between;gap:12px;padding:15px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+.fact:last-child{border-bottom:0}
+.fact span{color:var(--muted)}
+.fact b{font-weight:600;text-align:right}
+.photo{margin-top:16px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);background:var(--card);aspect-ratio:16/10}
+.photo img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+.notes{margin-top:16px;padding:22px 24px;border-left:3px solid var(--accent)}
+.notes h3{font-size:1.3rem;margin-bottom:8px}
+.notes p{color:var(--soft);white-space:pre-line}
+.hist{margin-top:16px;padding:28px}
+.hist-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.hist-head h2{font-size:1.9rem}
+.support{margin-top:16px;padding:26px 28px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.support h3{font-size:1.6rem}
+.support p{color:var(--muted);font-size:.92rem;margin-top:4px}
+.support .acts{display:flex;gap:8px;flex-wrap:wrap}
+.disclaimer{margin-top:22px;font-size:.78rem;color:var(--muted);text-align:center}
+.archived-note{margin-bottom:16px}
+.skeleton{height:360px;border-radius:var(--radius);background:linear-gradient(90deg,var(--card) 0%,var(--card-2) 50%,var(--card) 100%);background-size:200% 100%;animation:sk 1.4s ease infinite}
+@keyframes sk{to{background-position:-200% 0}}
+footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.82rem}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media (max-width:900px){.r-grid{grid-template-columns:1fr}.lookup{grid-template-columns:1fr 1fr}.lookup .btn{grid-column:1/-1}}
+@media (max-width:560px){.lookup{grid-template-columns:1fr}.hero{padding:44px 0 30px}.status-card,.hist{padding:22px}.support{padding:22px}.support .acts .btn{flex:1}.plate{font-size:1.2rem}.top-back span{display:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a href="./" class="logo" aria-label="NK Automoción, inicio"><span class="nk-box">NK</span><span class="nk-word">AUTOMOCIÓN</span></a>
+    <div class="top-actions">
+      <a href="./" class="btn btn-ghost btn-sm top-back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5m6-6-6 6 6 6"/></svg><span>Volver a la web</span></a>
+      <a href="tel:+34922293649" class="btn btn-primary btn-sm" aria-label="Llamar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="lookupSec">
+    <div class="wrap">
+      <span class="eyebrow">Seguimiento</span>
+      <h1>Consulta el estado <span class="y">de tu vehículo</span></h1>
+      <p>Introduce la matrícula de tu vehículo para consultar su estado actual y ver cómo avanza el proceso.</p>
+      <form class="lookup" id="lookup" novalidate>
+        <div class="field"><label for="fPlate">Matrícula</label><input id="fPlate" class="plate-input" autocomplete="off" autocapitalize="characters" placeholder="1234 ABC" maxlength="14"></div>
+        <div class="field"><label for="fCode">Código de seguimiento</label><input id="fCode" class="plate-input" autocomplete="off" autocapitalize="characters" placeholder="Ej. K7M2QX" maxlength="20"></div>
+        <button class="btn btn-primary" type="submit" id="fBtn">Consultar vehículo</button>
+      </form>
+      <p class="lookup-note">Por tu seguridad, además de la matrícula necesitas el <b>código de seguimiento</b> que te dimos al dejar el vehículo. Si no lo tienes, llámanos al <a href="tel:+34922293649" class="y">922 29 36 49</a>.</p>
+      <div id="lookupMsg"></div>
+    </div>
+  </section>
+
+  <section class="result" id="result" hidden>
+    <div class="wrap" id="resultInner"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap"><span>© <span id="year">2026</span> NK Automoción · Santa Cruz de Tenerife</span><span><a href="./">Inicio</a> · <a href="./#contacto">Contacto</a></span></div>
+</footer>
+<div class="toasts" id="toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="nk-config.js"></script>
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s);
+const {esc,icon,fDate,fDateTime,fTime,fRel,photoUrl}=NK;
+const MILESTONES=[[0,'Registrado'],[20,'Iniciado'],[40,'En curso'],[60,'Avanzado'],[80,'Últimos detalles'],[100,'Finalizado']];
+const NOT_FOUND='No encontramos ningún vehículo asociado a esta matrícula. Comprueba los datos o contacta con nosotros.';
+let sb=null, token=null, channel=null, pollTimer=null, lastData=null, liveState='off', lastSync=null, syncTicker=null;
+$('#year').textContent=new Date().getFullYear();
+
+try{ sb=NK.client({auth:{persistSession:false,autoRefreshToken:false}}) }
+catch(e){ showLookupMsg('ko','No se ha podido conectar con el sistema de seguimiento. Recarga la página o llámanos al 922 29 36 49.') }
+
+function showLookupMsg(type,text){ $('#lookupMsg').innerHTML=text?`<div class="msg ${type}">${esc(text)}</div>`:'' }
+function toast(t,type){const el=document.createElement('div');el.className='toast '+(type||'');el.textContent=t;$('#toasts').appendChild(el);setTimeout(()=>el.remove(),4200)}
+function errText(code){
+  if(code==='not_found')return NOT_FOUND;
+  if(code==='too_many')return 'Has realizado demasiados intentos. Espera unos minutos antes de volver a intentarlo o llámanos al 922 29 36 49.';
+  if(code==='invalid')return 'Revisa la matrícula y el código de seguimiento: parece que falta algún dato.';
+  return 'No hemos podido realizar la consulta. Inténtalo de nuevo en unos segundos.';
+}
+
+/* ---------- Consulta ---------- */
+async function lookup(plate,code){
+  if(!sb)return;
+  const btn=$('#fBtn');btn.classList.add('loading');btn.disabled=true;showLookupMsg('','');
+  try{
+    const {data,error}=await sb.rpc('get_tracking',{p_plate:plate,p_code:code});
+    if(error)throw error;
+    if(data&&data.error){showLookupMsg('ko',errText(data.error));return}
+    token=data.token;
+    history.replaceState(null,'','#t='+token);
+    render(data,true);startLive();
+  }catch(e){console.error(e);showLookupMsg('ko',errText())}
+  finally{btn.classList.remove('loading');btn.disabled=false}
+}
+async function fetchByToken(initial){
+  if(!sb||!token)return;
+  try{
+    const {data,error}=await sb.rpc('get_tracking_by_token',{p_token:token});
+    if(error)throw error;
+    if(data&&data.error){
+      if(initial){$('#result').hidden=true;$('#lookupSec').hidden=false;showLookupMsg('ko',data.error==='not_found'?'Este enlace de seguimiento ya no es válido. '+NOT_FOUND:errText(data.error))}
+      return;
+    }
+    render(data,initial);
+    if(initial)startLive();
+  }catch(e){console.error(e);if(initial){$('#result').hidden=true;$('#lookupSec').hidden=false;showLookupMsg('ko',errText())}}
+}
+
+$('#lookup').addEventListener('submit',e=>{
+  e.preventDefault();
+  const p=$('#fPlate'),c=$('#fCode');
+  [p,c].forEach(x=>x.parentElement.classList.remove('err'));
+  const pn=NK.normPlate(p.value),cn=NK.normPlate(c.value);
+  const bad=[];if(pn.length<4)bad.push(p);if(cn.length<4)bad.push(c);
+  if(bad.length){bad.forEach(x=>x.parentElement.classList.add('err'));showLookupMsg('ko',pn.length<4?'Introduce una matrícula válida.':'Introduce tu código de seguimiento.');bad[0].focus();return}
+  lookup(pn,cn);
+});
+
+/* ---------- Pintar ficha ---------- */
+function render(d,first){
+  const prevProgress=lastData?lastData.progress:0;
+  const changed=lastData&&(lastData.progress!==d.progress||(lastData.status&&d.status&&lastData.status.key!==d.status.key)||lastData.public_notes!==d.public_notes);
+  lastData=d;markSync();
+  if(d.brand&&d.brand.accent)document.documentElement.style.setProperty('--accent',d.brand.accent);
+  $('#lookupSec').hidden=true;$('#result').hidden=false;
+  const st=d.status||{label:'—',color:'#8f97a3',icon:'dot',description:''};
+  const c=st.color||'#f2c637';
+  const etaTxt=d.eta?fDate(d.eta):'Pendiente de confirmar';
+  const tl=(d.timeline||[]);
+  $('#resultInner').innerHTML=`
+    <div class="r-head">
+      <div>
+        <span class="eyebrow">Seguimiento de tu vehículo</span>
+        <h1 class="r-title">${esc(d.make_model)}</h1>
+      </div>
+      <div class="plate" aria-label="Matrícula"><b>E</b><span>${esc(String(d.plate).toUpperCase())}</span></div>
+    </div>
+    ${d.archived?'<div class="msg info archived-note">Este proceso está cerrado. Mostramos la última información registrada.</div>':''}
+    <div class="r-grid">
+      <div>
+        <div class="card status-card" style="--c:${esc(c)}">
+          <div class="st-top">
+            <div><span class="lbl">Estado actual</span><div style="margin-top:10px"><span class="badge" style="--c:${esc(c)}">${icon(st.icon)}${esc(st.label)}</span></div></div>
+            <span class="live" id="live"><i></i><span id="liveTxt">Conectando…</span></span>
+          </div>
+          <p class="st-desc">${esc(st.description||'')}</p>
+          <div class="st-prog">
+            <div class="st-prog-head"><span class="lbl">Progreso del proceso</span><span class="prog-num" id="pNum" aria-live="polite">${first?0:prevProgress}<i>%</i></span></div>
+            <div class="prog" style="--c:${esc(c)}">
+              <div class="prog-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${d.progress}"><div class="prog-fill" id="pFill" style="width:${first?0:prevProgress}%"></div></div>
+              <div class="prog-steps">${MILESTONES.map(([v,l])=>`<span class="${d.progress>=v?'on':''}">${l}</span>`).join('')}</div>
+            </div>
+          </div>
+        </div>
+        ${d.public_notes?`<div class="card notes"><h3>Observaciones</h3><p>${esc(d.public_notes)}</p></div>`:''}
+        <div class="card hist">
+          <div class="hist-head"><h2>Historial de <span class="y">seguimiento</span></h2><span class="muted" style="font-size:.84rem">${tl.length} actualizaci${tl.length===1?'ón':'ones'}</span></div>
+          ${tl.length?`<ol class="tl">${tl.map((u,i)=>{const sc=(u.status&&u.status.color)||'#8f97a3';return `<li class="${i===0?'first':''}" style="--c:${esc(sc)}">
+              <span class="tl-dot">${icon(u.status&&u.status.icon)}</span>
+              <div class="tl-head"><b>${esc(u.status?u.status.label:'Actualización')}</b>${u.progress!=null?`<span class="tl-pct">${u.progress}%</span>`:''}<span class="tl-new">Último</span><time datetime="${esc(u.at)}">${fDateTime(u.at)}</time></div>
+              ${u.note?`<p>${esc(u.note)}</p>`:''}
+              ${u.photo?`<img src="${esc(photoUrl(u.photo))}" alt="Foto de la actualización" loading="lazy" data-zoom>`:''}
+            </li>`}).join('')}</ol>`:'<p class="muted">Aún no hay actualizaciones.</p>'}
+        </div>
+      </div>
+      <div>
+        <div class="card facts">
+          <div class="fact"><span>Matrícula</span><b>${esc(String(d.plate).toUpperCase())}</b></div>
+          <div class="fact"><span>Vehículo</span><b>${esc(d.make_model)}</b></div>
+          <div class="fact"><span>Fecha de registro</span><b>${fDate(d.entry_date)}</b></div>
+          <div class="fact"><span>Última actualización</span><b title="${esc(fDateTime(d.updated_at))}">${fDateTime(d.updated_at)}<br><small class="muted" style="font-weight:400">${fRel(d.updated_at)}</small></b></div>
+          <div class="fact"><span>Fecha estimada de finalización</span><b>${etaTxt}</b></div>
+          <div class="fact"><span>Última sincronización</span><b id="syncAt">${fTime(lastSync)}</b></div>
+        </div>
+        ${d.photo?`<div class="photo"><img src="${esc(photoUrl(d.photo))}" alt="Foto de tu vehículo" data-zoom></div>`:''}
+        <div class="card support">
+          <div><h3>¿Tienes dudas?</h3><p>Habla directamente con nuestro equipo.</p></div>
+          <div class="acts">
+            <a class="btn btn-primary btn-sm" href="tel:+34922293649">Llamar</a>
+            <a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="https://wa.me/${NK.WA_BUSINESS}?text=${encodeURIComponent('Hola, quiero consultar por mi vehículo con matrícula '+String(d.plate).toUpperCase()+'.')}">WhatsApp</a>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="otherBtn" style="margin-top:16px;width:100%">Consultar otro vehículo</button>
+      </div>
+    </div>
+    <p class="disclaimer">Este seguimiento muestra el estado del trabajo que registra nuestro equipo. No es una localización GPS del vehículo.</p>`;
+  setLive(liveState);
+  // animación de la barra y del número
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{const f=$('#pFill');if(f)f.style.width=d.progress+'%'}));
+  animateNum(first?0:prevProgress,d.progress);
+  $('#otherBtn').onclick=()=>{stopLive();token=null;lastData=null;history.replaceState(null,'',location.pathname);$('#result').hidden=true;$('#lookupSec').hidden=false;$('#fPlate').value='';$('#fCode').value='';$('#fPlate').focus()};
+  if(changed)toast('Tu vehículo se ha actualizado','ok');
+}
+function animateNum(a,b){const el=$('#pNum');if(!el)return;const t0=performance.now(),D=1200;(function f(t){const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);el.innerHTML=Math.round(a+(b-a)*e)+'<i>%</i>';if(k<1)requestAnimationFrame(f)})(t0)}
+
+document.addEventListener('click',e=>{const img=e.target.closest('[data-zoom]');if(!img)return;const lb=document.createElement('div');lb.className='lightbox';lb.innerHTML=`<img src="${img.src}" alt="">`;lb.onclick=()=>lb.remove();document.body.appendChild(lb)});
+
+/* ---------- Tiempo real + respaldo ---------- */
+function markSync(){lastSync=new Date();const el=$('#syncAt');if(el)el.textContent=fTime(lastSync)}
+function setLive(s){
+  liveState=s;const el=$('#live'),tx=$('#liveTxt');if(!el)return;
+  el.className='live '+(s==='on'?'on':s==='poll'?'poll':'');
+  tx.textContent=s==='on'?'En directo':s==='poll'?'Actualización automática':'Conectando…';
+}
+function startLive(){
+  stopLive();
+  try{
+    channel=sb.channel('track-'+token).on('broadcast',{event:'update'},()=>fetchByToken(false)).subscribe(status=>{
+      if(status==='SUBSCRIBED'){setLive('on');schedulePoll(60000)}
+      else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){setLive('poll');schedulePoll(20000)}
+    });
+  }catch(e){setLive('poll')}
+  schedulePoll(20000);
+  syncTicker=setInterval(()=>{},30000);
+}
+function schedulePoll(ms){clearInterval(pollTimer);pollTimer=setInterval(()=>{if(document.visibilityState==='visible')fetchByToken(false)},ms)}
+function stopLive(){clearInterval(pollTimer);clearInterval(syncTicker);if(channel){try{sb.removeChannel(channel)}catch(e){}channel=null}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&token)fetchByToken(false)});
+
+/* ---------- Arranque ---------- */
+function init(){
+  const h=new URLSearchParams(location.hash.slice(1));
+  if(h.get('t')&&/^[0-9a-f]{36}$/.test(h.get('t'))){
+    token=h.get('t');$('#lookupSec').hidden=true;$('#result').hidden=false;$('#resultInner').innerHTML='<div class="skeleton"></div>';
+    fetchByToken(true);
+  }else if(h.get('m')){
+    $('#fPlate').value=h.get('m');$('#fCode').value=h.get('c')||'';
+    history.replaceState(null,'',location.pathname);
+    if(h.get('c'))lookup(NK.normPlate(h.get('m')),NK.normPlate(h.get('c')));else $('#fCode').focus();
+  }
+}
+init();
+})();
+</script>
+</body>
+</html>
