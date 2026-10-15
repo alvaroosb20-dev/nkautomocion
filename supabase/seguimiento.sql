@@ -11,7 +11,7 @@ create table public.app_settings(
   updated_at timestamptz not null default now()
 );
 insert into public.app_settings(key,value) values
- ('admin_emails','["nkautomocion@gmail.com"]'),
+ ('admin_emails','["nkautomocion@gmail.com","alvaroosb20@gmail.com"]'),
  ('notifications','{"enabled":true,"on_status_change":true,"on_ready":true}'),
  ('brand','{"accent":"#f2c637","name":"NK Automoción"}');
 
