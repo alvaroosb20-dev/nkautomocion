@@ -116,11 +116,17 @@ header.hide{transform:translateY(-100%)}
 .burger{display:none;width:46px;height:46px;border-radius:12px;border:1px solid var(--line-2);place-items:center;background:rgba(8,9,11,.5)}
 
 /* Mobile nav */
-.mnav{position:fixed;inset:0;background:var(--bg);z-index:55;padding:120px 22px 40px;display:flex;flex-direction:column;clip-path:circle(0% at calc(100% - 45px) 42px);transition:clip-path .8s var(--ease)}
+.mnav{position:fixed;inset:0;background:var(--bg);z-index:55;padding:96px 22px calc(30px + env(safe-area-inset-bottom));display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;clip-path:circle(0% at calc(100% - 45px) 42px);transition:clip-path .8s var(--ease)}
 .mnav.open{clip-path:circle(150% at calc(100% - 45px) 42px)}
-.mnav a.ml{font-family:var(--display);text-transform:uppercase;font-size:2.9rem;font-weight:700;line-height:1;padding:14px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.mnav a.ml{font-family:var(--display);text-transform:uppercase;font-size:clamp(1.8rem,8.4vw,2.6rem);font-weight:700;line-height:1;padding:12px 0;flex:none;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
 .mnav a.ml span{font-family:var(--mono);font-size:.75rem;color:var(--accent);font-weight:500}
-.mnav .btn{margin-top:auto;width:100%}
+.mnav .btn{margin-top:26px;width:100%;flex:none}
+.mnav a.hot{color:var(--accent)}
+.mnav a.hot b{font-weight:inherit;background:linear-gradient(90deg,var(--accent) 0%,#fff 45%,var(--accent) 60%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:hotShine 2.8s linear infinite}
+.mnav a.hot span{background:var(--accent);color:var(--ink)!important;padding:3px 7px;border-radius:5px;font-weight:700!important;animation:hotPulse 1.6s ease-in-out infinite}
+@keyframes hotShine{to{background-position:-220% 0}}
+@keyframes hotPulse{50%{transform:scale(1.12)}}
+body.menu-open .callbar{display:none!important}
 
 /* ===== HERO ===== */
 .hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:center;overflow:hidden;isolation:isolate;padding:120px 0 150px}
@@ -526,7 +532,7 @@ footer ul a:hover{color:var(--accent)}
   <a class="ml" href="#como-trabajamos">Cómo trabajamos <span>03</span></a>
   <a class="ml" href="#nosotros">Quiénes somos <span>04</span></a>
   <a class="ml" href="#contacto">Contacto <span>05</span></a>
-  <a class="ml" href="trabaja-con-nosotros.html">Trabaja con nosotros <span>06</span></a>
+  <a class="ml hot" href="trabaja-con-nosotros.html"><b>Trabaja con nosotros</b> <span>Empleo</span></a>
   <a class="btn btn-primary btn-lg" href="tel:+34922293649"><svg width="18" height="18"><use href="#i-phone"/></svg>Llamar al 922 29 36 49</a>
 </nav>
 
@@ -1179,7 +1185,7 @@ requestAnimationFrame(frame);
 
 /* ========== MENÚ MÓVIL ========== */
 const mnav=$('#mnav'),burger=$('#burger'),bp=$('#burgerPath');
-function toggleMenu(o){mnav.classList.toggle('open',o);burger.setAttribute('aria-expanded',o);bp.setAttribute('d',o?'M6 6l12 12M18 6 6 18':'M4 8h16M4 16h16');document.body.style.overflow=o?'hidden':''}
+function toggleMenu(o){mnav.classList.toggle('open',o);burger.setAttribute('aria-expanded',o);bp.setAttribute('d',o?'M6 6l12 12M18 6 6 18':'M4 8h16M4 16h16');document.body.style.overflow=o?'hidden':'';document.body.classList.toggle('menu-open',o)}
 burger.onclick=()=>toggleMenu(!mnav.classList.contains('open'));
 mnav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>toggleMenu(false)));
 

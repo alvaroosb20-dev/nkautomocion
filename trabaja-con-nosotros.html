@@ -465,7 +465,34 @@ footer ul a:hover{color:var(--accent)}
 .perk .ic{margin-bottom:26px}
 .perk h3{font-size:1.9rem;margin-bottom:10px}
 .perk p{color:var(--muted);font-size:.95rem}
-.areas{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.areas{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.area{padding:30px 28px!important;position:relative;overflow:hidden;isolation:isolate}
+.area::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(110deg,transparent 30%,rgba(242,198,55,.12) 50%,transparent 70%);background-size:250% 100%;animation:areaSweep 4s ease-in-out infinite}
+.area:nth-child(2)::before{animation-delay:2s}
+.area b{font-size:1.9rem!important}
+.area>span:nth-child(2){min-width:0;flex:1}
+@media (max-width:760px){.area{padding:22px 18px!important;gap:14px!important}.area b{font-size:1.45rem!important;overflow-wrap:anywhere}}
+.area .ic{animation:icFloat 3s ease-in-out infinite}
+@keyframes areaSweep{0%{background-position:150% 0}60%,100%{background-position:-100% 0}}
+@keyframes icFloat{50%{transform:translateY(-5px)}}
+/* banda en movimiento */
+.job-band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg-2);overflow:hidden;padding:22px 0}
+.job-band .row{display:flex;width:max-content;animation:jobMq 26s linear infinite}
+.job-band .row.rev{animation-direction:reverse;margin-top:6px}
+.job-band span{display:inline-flex;align-items:center;gap:28px;padding-right:28px;font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:clamp(2.2rem,5vw,4rem);line-height:1.05;white-space:nowrap}
+.job-band .rev span{color:transparent;-webkit-text-stroke:1px var(--line-2)}
+.job-band span::after{content:"";width:14px;height:14px;background:var(--accent);transform:rotate(45deg);flex:none}
+.job-band .rev span::after{background:none;border:1px solid var(--line-2)}
+@keyframes jobMq{to{transform:translateX(-50%)}}
+/* hero en movimiento */
+.job-hero .hero-glow{animation:glowMove 9s ease-in-out infinite alternate}
+@keyframes glowMove{0%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-62%,-38%) scale(1.15)}100%{transform:translate(-40%,-55%) scale(.95)}}
+.job-hero h1 .y{background:linear-gradient(90deg,var(--accent) 0%,#fff3c4 40%,var(--accent) 70%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:hotShine 4s linear infinite}
+@keyframes hotShine{to{background-position:-220% 0}}
+.perk .ic{animation:icFloat 3.4s ease-in-out infinite}
+.perk:nth-child(2) .ic{animation-delay:.6s}.perk:nth-child(3) .ic{animation-delay:1.2s}
+.perk{transition:transform .5s var(--ease),border-color .3s}
+.perk:hover{transform:translateY(-6px);border-color:rgba(242,198,55,.4)}
 .area{display:flex;align-items:center;gap:16px;padding:22px 24px;border:1px solid var(--line);border-radius:18px;background:var(--card);transition:border-color .3s,transform .5s var(--ease);text-align:left;width:100%}
 .area:hover{border-color:rgba(242,198,55,.45);transform:translateY(-3px)}
 .area b{font-family:var(--display);text-transform:uppercase;font-size:1.45rem;font-weight:700;line-height:1}
@@ -488,7 +515,7 @@ footer ul a:hover{color:var(--accent)}
 .simple-foot{border-top:1px solid var(--line);padding:34px 0;color:var(--muted);font-size:.85rem}
 .simple-foot .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
 .simple-foot a:hover{color:var(--accent)}
-@media (max-width:1000px){.perks,.areas{grid-template-columns:1fr 1fr}.job-form-wrap{grid-template-columns:1fr;gap:44px}}
+@media (max-width:1000px){.perks{grid-template-columns:1fr 1fr}.job-form-wrap{grid-template-columns:1fr;gap:44px}}
 @media (max-width:760px){.job-hero{padding:120px 0 70px}.perks,.areas{grid-template-columns:1fr}.perk{padding:26px}.nav-back span{display:none}.nav-call span{display:none}.nav-actions .btn-sm{padding:0 13px}}
 </style>
 
@@ -529,6 +556,11 @@ footer ul a:hover{color:var(--accent)}
     </div>
   </div>
 </section>
+<div class="job-band" aria-hidden="true">
+  <div class="row"><span>Únete al equipo</span><span>Administrativo</span><span>Técnico / mecánico</span><span>Pasión por el motor</span><span>Únete al equipo</span><span>Administrativo</span><span>Técnico / mecánico</span><span>Pasión por el motor</span></div>
+  <div class="row rev"><span>Crece con nosotros</span><span>Santa Cruz de Tenerife</span><span>Equipo cercano</span><span>Crece con nosotros</span><span>Santa Cruz de Tenerife</span><span>Equipo cercano</span></div>
+</div>
+
 
 <section style="padding-top:40px">
   <div class="wrap">
@@ -548,7 +580,7 @@ footer ul a:hover{color:var(--accent)}
   <div class="wrap">
     <div class="sec-head">
       <div class="reveal"><span class="eyebrow">Áreas</span><h2>¿Dónde encajas <span class="y">tú?</span></h2></div>
-      <p class="reveal d1">Elige el área que más te interese. Si no ves la tuya, envíanos tu candidatura igualmente.</p>
+      <p class="reveal d1">Ahora mismo buscamos perfiles para estas dos áreas. Elige la tuya y envíanos tu candidatura.</p>
     </div>
     <div class="areas" id="areas"></div>
   </div>
@@ -606,14 +638,10 @@ footer ul a:hover{color:var(--accent)}
 const $=s=>document.querySelector(s);
 const WA_NUMBER='34614133829';
 const AREAS=[
- ['Mostrador y ventas','Atención al cliente y asesoramiento'],
- ['Almacén y logística','Recepción, stock y preparación de pedidos'],
- ['Reparto','Entregas a clientes y talleres'],
- ['Técnico / mecánico','Conocimiento técnico de vehículos'],
- ['Administración','Facturación y gestión'],
- ['Comercial','Relación con pymes y talleres']
+ ['Administrativo','Facturación, gestión y atención al cliente'],
+ ['Técnico / mecánico','Diagnóstico, montaje y conocimiento técnico de vehículos']
 ];
-$('#areas').innerHTML=AREAS.map((a,i)=>`<button type="button" class="area reveal${i%3?' d'+(i%3):''}" data-area="${a[0]}"><span class="ic"><svg width="20" height="20"><use href="#i-check"/></svg></span><span><b>${a[0]}</b><small>${a[1]}</small></span><svg class="go" width="18" height="18"><use href="#i-arrow"/></svg></button>`).join('');
+$('#areas').innerHTML=AREAS.map((a,i)=>`<button type="button" class="area reveal${i?' d1':''}" data-area="${a[0]}"><span class="ic"><svg width="20" height="20"><use href="#i-check"/></svg></span><span><b>${a[0]}</b><small>${a[1]}</small></span><svg class="go" width="18" height="18"><use href="#i-arrow"/></svg></button>`).join('');
 $('#jArea').innerHTML+=AREAS.map(a=>`<option>${a[0]}</option>`).join('')+'<option>Otra</option>';
 $('#areas').addEventListener('click',e=>{const b=e.target.closest('.area');if(!b)return;$('#jArea').value=b.dataset.area;document.getElementById('candidatura').scrollIntoView({behavior:'smooth'});setTimeout(()=>$('#jName').focus({preventScroll:true}),800)});
 const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});
