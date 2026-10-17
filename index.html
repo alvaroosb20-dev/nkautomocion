@@ -208,7 +208,7 @@
 </script>
 <script>
   document.documentElement.classList.add('js');
-  setTimeout(function(){document.documentElement.classList.add('ready')},4500);
+  setTimeout(function(){document.documentElement.classList.add('ready')},6500);
 </script>
 <style>
 :root{
@@ -281,6 +281,31 @@ h2 .y{color:var(--accent)}
 .ready .loader{transform:translateY(-100%)}
 .ready .loader .ld-inner{opacity:0}
 html:not(.js) .loader{display:none}
+/* Coche de la pantalla de carga (diseño original NK) */
+.ld-car{position:relative;width:min(400px,84vw);margin:0 auto 30px;transform-origin:50% 85%;will-change:transform}
+.ld-car svg{display:block;width:100%;height:auto;overflow:visible}
+.ld-car .body{opacity:0;transition:opacity .9s ease}
+.loader.on .ld-car .body{opacity:1}
+.ld-car .lb,.ld-car .lbs{transform-box:fill-box;transform-origin:50% 50%;transform:scaleX(0);opacity:.15}
+.loader.lights .ld-car .lb{animation:ldIgnite .55s cubic-bezier(.2,.9,.3,1) forwards}
+.loader.lights .ld-car .lbs{animation:ldIgnite .35s .2s ease-out forwards}
+@keyframes ldIgnite{0%{transform:scaleX(0);opacity:.2}55%{transform:scaleX(1.02);opacity:1}70%{opacity:.6}100%{transform:scaleX(1);opacity:1}}
+.ld-car .bloom,.ld-car .floor{opacity:0;transition:opacity .5s ease}
+.loader.lights .ld-car .bloom{opacity:.9}
+.loader.lights .ld-car .floor{opacity:.55}
+.ld-car .flame{opacity:0}
+.loader.idle .ld-car .flame{animation:ldFlame .14s steps(2) infinite}
+.loader.go .ld-car .flame{animation:ldFlame .08s steps(2) infinite}
+@keyframes ldFlame{0%{opacity:.35}50%{opacity:.95}100%{opacity:.5}}
+.loader.idle .ld-car{animation:ldIdle .09s linear infinite}
+@keyframes ldIdle{0%{transform:translate(0,0)}50%{transform:translate(.4px,.6px)}100%{transform:translate(-.3px,0)}}
+.loader.go .ld-car{animation:ldDrive 1.15s cubic-bezier(.55,0,.8,.2) forwards}
+@keyframes ldDrive{0%{transform:translateY(0) scale(1)}12%{transform:translateY(4px) scale(1.015)}100%{transform:translateY(-150px) scale(.12);opacity:0;filter:blur(1.5px)}}
+.ld-trail{position:absolute;bottom:22%;width:3px;height:0;border-radius:3px;background:linear-gradient(to top,rgba(255,40,50,.0),rgba(255,40,50,.85));filter:blur(1px);opacity:0}
+.ld-trail.l{left:21%}.ld-trail.r{right:21%}
+.loader.go .ld-trail{animation:ldTrail 1.1s cubic-bezier(.55,0,.8,.2) forwards}
+@keyframes ldTrail{0%{height:0;opacity:0}20%{opacity:.9}100%{height:150px;opacity:0;transform:translateY(-60px)}}
+
 
 /* Logo */
 .logo{display:inline-flex;align-items:center;gap:10px}
@@ -700,6 +725,61 @@ footer ul a:hover{color:var(--accent)}
 <!-- Pantalla de carga -->
 <div class="loader" id="loader" aria-hidden="true">
   <div class="ld-inner">
+    <div class="ld-car" aria-hidden="true">
+      <span class="ld-trail l"></span><span class="ld-trail r"></span>
+      <svg viewBox="0 0 400 210">
+        <defs>
+          <linearGradient id="cBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2e35"/><stop offset=".55" stop-color="#14171b"/><stop offset="1" stop-color="#090a0c"/></linearGradient>
+          <linearGradient id="cGlass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c2027"/><stop offset="1" stop-color="#050607"/></linearGradient>
+          <linearGradient id="cEdge" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+          <radialGradient id="cBloom"><stop offset="0" stop-color="#ff2a36" stop-opacity=".75"/><stop offset="1" stop-color="#ff2a36" stop-opacity="0"/></radialGradient>
+          <radialGradient id="cFlame"><stop offset="0" stop-color="#fff2c0"/><stop offset=".45" stop-color="#ff9a2a"/><stop offset="1" stop-color="#ff3a1a" stop-opacity="0"/></radialGradient>
+          <filter id="cGlow" x="-20%" y="-200%" width="140%" height="500%"><feGaussianBlur stdDeviation="3"/></filter>
+        </defs>
+        <ellipse class="floor" cx="200" cy="196" rx="170" ry="10" fill="url(#cBloom)"/>
+        <g class="body">
+          <ellipse cx="200" cy="192" rx="185" ry="9" fill="#000" opacity=".7"/>
+          <!-- ruedas -->
+          <rect x="30" y="140" width="50" height="52" rx="10" fill="#0b0c0e"/>
+          <rect x="320" y="140" width="50" height="52" rx="10" fill="#0b0c0e"/>
+          <!-- carrocería: cuña baja y ancha -->
+          <path d="M14 150 L26 112 L78 100 L124 66 L276 66 L322 100 L374 112 L386 150 L386 170 Q386 180 376 180 L24 180 Q14 180 14 170 Z" fill="url(#cBody)"/>
+          <!-- luneta -->
+          <path d="M132 72 L268 72 L300 98 L100 98 Z" fill="url(#cGlass)"/>
+          <path d="M138 75 L262 75" stroke="url(#cEdge)" stroke-width="1"/>
+          <!-- alerón integrado -->
+          <path d="M84 100 L316 100 L330 108 L70 108 Z" fill="#0e1013"/>
+          <path d="M70 108 L330 108" stroke="url(#cEdge)" stroke-width="1.2"/>
+          <!-- líneas de carrocería -->
+          <path d="M26 112 L78 100 M374 112 L322 100" stroke="url(#cEdge)" stroke-width="1"/>
+          <path d="M20 142 L380 142" stroke="#000" stroke-opacity=".45" stroke-width="1"/>
+          <!-- barra LED -->
+          <rect x="44" y="116" width="312" height="9" rx="4.5" fill="#2a0508"/>
+          <ellipse class="bloom" cx="200" cy="120" rx="190" ry="22" fill="url(#cBloom)"/>
+          <rect class="lb" x="46" y="117.5" width="308" height="6" rx="3" fill="#ff2433" filter="url(#cGlow)"/>
+          <rect class="lb" x="46" y="118.5" width="308" height="4" rx="2" fill="#ff5a63"/>
+          <rect class="lbs" x="30" y="126" width="34" height="5" rx="2.5" fill="#ff2433"/>
+          <rect class="lbs" x="336" y="126" width="34" height="5" rx="2.5" fill="#ff2433"/>
+          <!-- emblema NK -->
+          <rect x="186" y="128" width="28" height="14" rx="2" fill="#f2c637"/>
+          <text x="199.5" y="139" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-style="italic" font-size="11" fill="#0b0b0b">NK</text>
+          <!-- matrícula -->
+          <rect x="166" y="147" width="68" height="14" rx="2" fill="#e9ebee"/>
+          <rect x="166" y="147" width="7" height="14" rx="1" fill="#1f4fbf"/>
+          <text x="203" y="158" text-anchor="middle" font-family="Menlo,monospace" font-size="9.5" fill="#111" letter-spacing="1">NK 0001</text>
+          <!-- difusor -->
+          <path d="M96 164 L304 164 L316 180 L84 180 Z" fill="#07080a"/>
+          <path d="M120 166 L114 180 M150 166 L147 180 M250 166 L253 180 M280 166 L286 180" stroke="#1b1e23" stroke-width="2"/>
+          <!-- escapes -->
+          <ellipse cx="180" cy="173" rx="11" ry="6" fill="#2b2f36" stroke="#5a616c" stroke-width="1.2"/>
+          <ellipse cx="220" cy="173" rx="11" ry="6" fill="#2b2f36" stroke="#5a616c" stroke-width="1.2"/>
+          <ellipse cx="180" cy="173" rx="7" ry="3.6" fill="#050506"/>
+          <ellipse cx="220" cy="173" rx="7" ry="3.6" fill="#050506"/>
+          <ellipse class="flame" cx="180" cy="175" rx="12" ry="7" fill="url(#cFlame)"/>
+          <ellipse class="flame" cx="220" cy="175" rx="12" ry="7" fill="url(#cFlame)"/>
+        </g>
+      </svg>
+    </div>
     <div class="ld-logo"><span class="nk-box">NK</span><span class="nk-word">AUTOMOCIÓN</span></div>
     <div class="ld-bar"><i id="ldBar"></i></div>
     <div class="ld-meta"><span id="ldTxt">Arrancando motor</span><span id="ldNum">000</span></div>
@@ -1154,22 +1234,22 @@ void main(){
     if(face){
       // superficie de frenado mecanizada (acero)
       float rings=hash(floor(Lq*140.))*.5+hash(floor(Lq*37.))*.5;
-      vec3 base=vec3(.58,.6,.63)*(.85+.25*rings);
-      float rough=.28;
-      vec3 e=mix(env(R),env(normalize(R+n*.6)),rough);
+      vec3 base=vec3(.42,.43,.45)*(.88+.2*rings);
+      float rough=.62;
+      vec3 e=mix(env(R),env(normalize(R+n*1.2)),rough)*.85;
       // brillo anisotrópico circular
       vec3 tng=normalize(vec3(-q.y,q.x,0.));
       float an=pow(max(0.,1.-abs(dot(H1,tng))),18.)*pow(max(dot(n,H1),0.),6.);
-      col=base*e*(.5+.5*o)+base*(d1*.25+d2*.1)+vec3(1.)*an*sh*1.6+base*.05;
+      col=base*e*(.45+.55*o)+base*(d1*.42+d2*.14)*o+vec3(.9)*an*sh*.55+base*.06;
     }else{
       // canto, ventilación y taladros: fundición oscura
       vec3 base=vec3(.14,.13,.125);
       col=base*(.25+d1*.9+d2*.4+d3*.3)*o+env(normalize(R+n))*base*.6+fr*.06;
     }
   }else if(m.y<2.5){
-    vec3 base=vec3(.36,.37,.39);
-    vec3 e=mix(env(R),env(n),.45);
-    col=base*e*o*.9+base*(d1*.35+d2*.15)*o+pow(max(dot(n,H1),0.),40.)*sh*.6;
+    vec3 base=vec3(.24,.245,.26);
+    vec3 e=mix(env(R),env(n),.7);
+    col=base*e*o*.8+base*(d1*.5+d2*.18)*o+pow(max(dot(n,H1),0.),30.)*sh*.25;
   }else if(m.y<3.5){
     // pinza pintada con barniz
     vec3 base=vec3(.82,.47,.018);
@@ -1436,13 +1516,20 @@ requestAnimationFrame(frame);
 
 /* ========== PANTALLA DE CARGA ========== */
 (function(){
-  const bar=$('#ldBar'),num=$('#ldNum'),txt=$('#ldTxt'),t0=performance.now(),D=reduce?200:1500;
+  const ld=$('#loader'),bar=$('#ldBar'),num=$('#ldNum'),txt=$('#ldTxt'),t0=performance.now(),D=reduce?200:3600;
   const msgs=['Arrancando motor','Calentando frenos','Listo'];
+  let gone=false;
+  if(!reduce){
+    requestAnimationFrame(()=>ld.classList.add('on'));
+    setTimeout(()=>ld.classList.add('lights'),700);
+    setTimeout(()=>ld.classList.add('idle'),1250);
+  }
   (function f(t){
     const k=clamp((t-t0)/D,0,1),e=1-Math.pow(1-k,3);
     bar.style.transform=`scaleX(${e})`;num.textContent=String(Math.round(e*100)).padStart(3,'0');
     txt.textContent=msgs[Math.min(2,Math.floor(k*3))];
-    if(k<1)requestAnimationFrame(f);else setTimeout(()=>{root.classList.add('ready');setTimeout(()=>$('#loader').style.display='none',1400)},150);
+    if(!reduce&&!gone&&k>=.66){gone=true;ld.classList.remove('idle');ld.classList.add('go')}
+    if(k<1)requestAnimationFrame(f);else setTimeout(()=>{root.classList.add('ready');setTimeout(()=>ld.style.display='none',1400)},250);
   })(t0);
 })();
 
