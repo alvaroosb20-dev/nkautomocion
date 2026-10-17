@@ -1067,82 +1067,123 @@ uniform vec2 uRes; uniform vec2 uCenter; uniform float uScale; uniform float uRo
 mat2 r2(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
 float hash(float x){return fract(sin(x*127.1)*43758.5453);}
 float sdCyl(vec3 p,float r,float h){vec2 d=abs(vec2(length(p.xy),p.z))-vec2(r,h);return min(max(d.x,d.y),0.)+length(max(d,0.));}
+float smax(float a,float b,float k){float h=clamp(.5-.5*(b-a)/k,0.,1.);return mix(b,a,h)+k*h*(1.-h);}
 vec2 pRep(vec2 p,float n,float off){float a=atan(p.y,p.x)+off;float s=6.2831853/n;a=mod(a+s*.5,s)-s*.5;return length(p)*vec2(cos(a),sin(a));}
+/* materiales: 1 disco · 2 buje · 3 pinza · 4 tornillos */
 vec2 map(vec3 p){
-  // Pinza (fija)
-  float L=length(p.xy); float ang=atan(p.y,p.x);
-  vec2 d2=vec2(abs(L-1.9)-.36,(abs(ang-1.)-.40)*L);
+  // --- Pinza (fija), con hueco por donde pasa el disco
+  float L=length(p.xy),ang=atan(p.y,p.x);
+  vec2 d2=vec2(abs(L-1.92)-.33,(abs(ang-1.)-.37)*L);
   float dxy=length(max(d2,0.))+min(max(d2.x,d2.y),0.);
-  vec2 w=vec2(dxy+.08,abs(p.z)-.44);
-  float cal=min(max(w.x,w.y),0.)+length(max(w,0.))-.08;
-  // tornillos de la pinza
-  vec3 b1=p-vec3(1.9*cos(.72),1.9*sin(.72),.5), b2=p-vec3(1.9*cos(1.28),1.9*sin(1.28),.5);
-  float bolt=min(sdCyl(b1,.1,.05),sdCyl(b2,.1,.05))-.01;
-  // Disco y buje (giran)
-  vec3 q=p; q.xy=r2(uRot)*q.xy;
-  float disc=sdCyl(q,2.,.16)-.015;
-  disc=max(disc,-(length(q.xy)-1.02));
+  vec2 w=vec2(dxy+.11,abs(p.z)-.42);
+  float cal=min(max(w.x,w.y),0.)+length(max(w,0.))-.11;
+  cal=smax(cal,-max(abs(p.z)-.215,L-2.07),.025);
+  // tornillos de fijación
+  vec3 b1=p-vec3(1.93*cos(.73),1.93*sin(.73),.53),b2=p-vec3(1.93*cos(1.27),1.93*sin(1.27),.53);
+  float bolt=min(sdCyl(b1,.072,.035),sdCyl(b2,.072,.035))-.008;
+  // --- Disco ventilado (gira)
+  vec3 q=p;q.xy=r2(uRot)*q.xy;float Lq=length(q.xy);
+  float disc=sdCyl(q,2.,.17)-.01;
+  disc=max(disc,-(Lq-1.0));
+  // cámara de ventilación con aletas
+  vec2 vq=pRep(q.xy,42.,0.);
+  float vane=abs(vq.y)-.032;
+  float vent=max(abs(q.z)-.052,max(1.07-Lq,-vane));
+  disc=smax(disc,-vent,.008);
+  // perforaciones con chaflán
   float holes=1e5;
-  for(int i=0;i<3;i++){float fi=float(i);vec2 h=pRep(q.xy,14.,fi*.149);h.x-=1.34+fi*.24;holes=min(holes,length(h)-.055);}
-  disc=max(disc,-holes);
-  // ranuras en la cara
-  vec2 sl=pRep(q.xy,6.,.26); float slot=max(abs(sl.y+ (sl.x-1.6)*.35)-.018, abs(sl.x-1.62)-.3);
-  disc=max(disc,-max(slot,.115-abs(q.z)));
-  float hat=sdCyl(q-vec3(0,0,.17),1.08,.34)-.03;
-  hat=max(hat,-(length(q.xy)-.34));
-  vec2 lg=pRep(q.xy,5.,0.); lg.x-=.64; hat=max(hat,-(length(lg)-.1));
-  float ring=sdCyl(q-vec3(0,0,.53),.86,.03);
-  hat=max(hat,-ring);
+  for(int i=0;i<3;i++){float fi=float(i);vec2 h=pRep(q.xy,14.,fi*.149);h.x-=1.34+fi*.235;holes=min(holes,length(h)-.05);}
+  disc=smax(disc,-holes,.022);
+  // ranuras curvas en la cara
+  vec2 sl=pRep(q.xy,6.,.26);
+  float slot=max(abs(sl.y+(sl.x-1.6)*.35)-.014,abs(sl.x-1.62)-.3);
+  disc=smax(disc,-max(slot,.135-abs(q.z)),.006);
+  // --- Buje / campana
+  float hat=sdCyl(q-vec3(0,0,.17),1.04,.33)-.035;
+  hat=max(hat,-(length(q.xy)-.33));
+  vec2 lg=pRep(q.xy,5.,0.);lg.x-=.63;hat=smax(hat,-(length(lg)-.085),.015);
+  hat=smax(hat,-sdCyl(q-vec3(0,0,.53),.82,.025),.01);
   vec2 res=vec2(disc,1.);
   if(hat<res.x)res=vec2(hat,2.);
   if(cal<res.x)res=vec2(cal,3.);
-  if(bolt<res.x)res=vec2(bolt,2.);
+  if(bolt<res.x)res=vec2(bolt,4.);
   return res;
 }
-vec3 nrm(vec3 p){vec2 e=vec2(.0015,-.0015);return normalize(e.xyy*map(p+e.xyy).x+e.yyx*map(p+e.yyx).x+e.yxy*map(p+e.yxy).x+e.xxx*map(p+e.xxx).x);}
-float ao(vec3 p,vec3 n){float o=0.,s=1.;for(int i=1;i<5;i++){float h=.04*float(i);o+=(h-map(p+n*h).x)*s;s*=.7;}return clamp(1.-2.2*o,0.,1.);}
+vec3 nrm(vec3 p){vec2 e=vec2(.0012,-.0012);return normalize(e.xyy*map(p+e.xyy).x+e.yyx*map(p+e.yyx).x+e.yxy*map(p+e.yxy).x+e.xxx*map(p+e.xxx).x);}
+float ao(vec3 p,vec3 n){float o=0.,s=1.;for(int i=1;i<6;i++){float h=.03*float(i);o+=(h-map(p+n*h).x)*s;s*=.75;}return clamp(1.-2.4*o,0.,1.);}
+float shadow(vec3 ro,vec3 rd){float r=1.,t=.02;for(int i=0;i<28;i++){float h=map(ro+rd*t).x;r=min(r,10.*h/t);t+=clamp(h,.02,.25);if(r<.02||t>4.)break;}return clamp(r,0.,1.);}
 vec3 env(vec3 r){
-  vec3 c=mix(vec3(.012,.013,.016),vec3(.07,.075,.085),smoothstep(-.7,.7,r.y));
-  c+=vec3(1.)*smoothstep(.5,.7,r.y)*smoothstep(1.,.82,r.y)*2.2;
-  c+=vec3(1.,.74,.2)*smoothstep(.75,.98,r.x)*.45;
-  c+=vec3(.8,.85,.95)*smoothstep(.45,.95,-r.x)*smoothstep(-.3,.3,r.y)*1.3;
-  c+=vec3(.9,.93,1.)*smoothstep(.35,.6,r.x)*smoothstep(.8,.6,r.x)*smoothstep(-.1,.4,r.y)*.9;
-  c+=vec3(1.)*smoothstep(.9,.99,r.z)*.25;
+  vec3 c=mix(vec3(.03,.032,.036),vec3(.16,.165,.175),smoothstep(-.8,.8,r.y));
+  c+=vec3(1.)*smoothstep(.45,.7,r.y)*smoothstep(1.,.78,r.y)*2.4;          // softbox superior
+  c+=vec3(.9,.94,1.)*smoothstep(.45,.95,-r.x)*smoothstep(-.35,.35,r.y)*1.5; // ventana izquierda
+  c+=vec3(1.,.8,.35)*smoothstep(.72,.98,r.x)*.55;                          // rebote cálido
+  c+=vec3(.85,.88,.95)*smoothstep(.3,.55,r.x)*smoothstep(.75,.55,r.x)*smoothstep(-.2,.4,r.y)*.8;
+  c+=vec3(.6)*smoothstep(.88,1.,r.z)*.35;
   return c;
 }
 vec3 aces(vec3 x){return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}
 void main(){
-  vec2 uv=(gl_FragCoord.xy-uCenter)/(min(uRes.x,uRes.y)*uScale);
+  float minR=min(uRes.x,uRes.y);
+  vec2 uv=(gl_FragCoord.xy-uCenter)/(minR*uScale);
   vec3 ro=vec3(0,0,8.),rd=normalize(vec3(uv,-3.2));
   mat2 ry=r2(uTilt.y),rx=r2(uTilt.x);
   ro.xz=ry*ro.xz;rd.xz=ry*rd.xz;ro.yz=rx*ro.yz;rd.yz=rx*rd.yz;
-  float b=dot(ro,rd),c=dot(ro,ro)-7.2,h=b*b-c;
+  float b=dot(ro,rd),c=dot(ro,ro)-7.4,h=b*b-c;
   if(h<0.){gl_FragColor=vec4(0.);return;}
   h=sqrt(h);float t=max(-b-h,0.),tmax=-b+h;
-  vec2 m=vec2(0.);bool hit=false;
-  for(int i=0;i<96;i++){m=map(ro+rd*t);if(m.x<.0012*t){hit=true;break;}t+=m.x*.8;if(t>tmax)break;}
-  if(!hit){gl_FragColor=vec4(0.);return;}
-  vec3 p=ro+rd*t,n=nrm(p),V=-rd,R=reflect(rd,n);
-  vec3 L1=normalize(vec3(-.5,.85,.55));
-  float dif=max(dot(n,L1),0.),o=ao(p,n);
+  float px=1.6/(minR*uScale*3.2);
+  vec2 m=vec2(0.);bool hit=false;float best=1e5,bestT=0.;
+  for(int i=0;i<110;i++){
+    m=map(ro+rd*t);
+    float ratio=m.x/t;if(ratio<best){best=ratio;bestT=t;}
+    if(m.x<.0009*t){hit=true;break;}
+    t+=m.x*.82;if(t>tmax)break;
+  }
+  float alpha=1.;
+  if(!hit){ if(best>px){gl_FragColor=vec4(0.);return;} t=bestT;alpha=1.-best/px; }
+  vec3 p=ro+rd*t;m=map(p);vec3 n=nrm(p),V=-rd,R=reflect(rd,n);
+  vec3 L1=normalize(vec3(-.55,.8,.6)),L2=normalize(vec3(.8,-.15,.45)),L3=normalize(vec3(.2,.5,-.9));
+  float o=ao(p,n),sh=shadow(p+n*.01,L1);
+  float d1=max(dot(n,L1),0.)*sh,d2=max(dot(n,L2),0.),d3=max(dot(n,L3),0.);
   float fr=pow(1.-max(dot(n,V),0.),5.);
-  float sp=pow(max(dot(R,L1),0.),60.);
+  vec3 H1=normalize(L1+V),H2=normalize(L2+V);
   vec3 col;
   if(m.y<1.5){
-    vec3 q=p;q.xy=r2(uRot)*q.xy;float L=length(q.xy);
-    float rings=hash(floor(L*170.))*step(.85,abs(n.z));
-    vec3 base=vec3(.56,.58,.62)*(.82+.3*rings);
-    col=env(R)*base*(.45+.55*o)+base*dif*.06+sp*vec3(.9);
+    vec3 q=p;q.xy=r2(uRot)*q.xy;float Lq=length(q.xy);
+    bool face=abs(n.z)>.82&&Lq>1.07;
+    if(face){
+      // superficie de frenado mecanizada (acero)
+      float rings=hash(floor(Lq*140.))*.5+hash(floor(Lq*37.))*.5;
+      vec3 base=vec3(.58,.6,.63)*(.85+.25*rings);
+      float rough=.28;
+      vec3 e=mix(env(R),env(normalize(R+n*.6)),rough);
+      // brillo anisotrópico circular
+      vec3 tng=normalize(vec3(-q.y,q.x,0.));
+      float an=pow(max(0.,1.-abs(dot(H1,tng))),18.)*pow(max(dot(n,H1),0.),6.);
+      col=base*e*(.5+.5*o)+base*(d1*.25+d2*.1)+vec3(1.)*an*sh*1.6+base*.05;
+    }else{
+      // canto, ventilación y taladros: fundición oscura
+      vec3 base=vec3(.14,.13,.125);
+      col=base*(.25+d1*.9+d2*.4+d3*.3)*o+env(normalize(R+n))*base*.6+fr*.06;
+    }
   }else if(m.y<2.5){
-    vec3 base=vec3(.2,.21,.23);
-    col=env(R)*base*o+base*dif*.15+sp*.4;
+    vec3 base=vec3(.36,.37,.39);
+    vec3 e=mix(env(R),env(n),.45);
+    col=base*e*o*.9+base*(d1*.35+d2*.15)*o+pow(max(dot(n,H1),0.),40.)*sh*.6;
+  }else if(m.y<3.5){
+    // pinza pintada con barniz
+    vec3 base=vec3(.82,.47,.018);
+    col=base*(.07+d1*.85+d2*.3+d3*.2)*o;
+    col+=base*.12*env(n)*o;
+    col+=env(R)*(.015+.32*fr)*o;
+    col+=vec3(1.)*(pow(max(dot(n,H1),0.),160.)*1.2*sh+pow(max(dot(n,H2),0.),90.)*.3);
   }else{
-    vec3 base=vec3(.89,.56,.045);
-    col=base*(.06+dif*1.1)*o+base*.12*env(n)+env(R)*(.05+.7*fr)+pow(max(dot(R,L1),0.),90.)*1.4;
+    vec3 base=vec3(.72,.73,.75);
+    col=base*env(R)*o+pow(max(dot(n,H1),0.),60.)*sh;
   }
-  col=aces(col*1.15);
+  col=aces(col*1.1);
   col=pow(col,vec3(.4545));
-  gl_FragColor=vec4(col,1.);
+  gl_FragColor=vec4(col*alpha,alpha);
 }
 </script>
 
@@ -1256,7 +1297,7 @@ const disc={ok:false,rot:0,tilt:[.42,-.55],tTilt:[.42,-.55],intro:0,visible:true
 function sizeDisc(){
   if(!disc.ok)return;
   const mobile=innerWidth<761;
-  const dpr=Math.min(devicePixelRatio||1,mobile?1.5:1.6);
+  const dpr=Math.min(devicePixelRatio||1,mobile?2:1.75);
   const w=disc.cv.clientWidth,h=disc.cv.clientHeight;
   disc.cv.width=Math.round(w*dpr);disc.cv.height=Math.round(h*dpr);
   disc.gl.viewport(0,0,disc.cv.width,disc.cv.height);
